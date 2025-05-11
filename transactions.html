@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System - Transactions</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+            position: relative; /* For absolute positioning of alerts */
+        }
+        header {
+            background-color: #333;
+            color: white;
+            padding: 1em 2em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 1.8em;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+        }
+        nav ul li {
+            margin-left: 1.5em;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        nav ul li a i {
+            margin-right: 0.5em;
+        }
+        nav ul li a.active {
+            font-weight: bold;
+        }
+        nav ul li button {
+            background: none;
+            color: white;
+            border: none;
+            padding: 0;
+            font-size: inherit;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        nav ul li button i {
+            margin-right: 0.5em;
+        }
+        main {
+            padding: 2em;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2em;
+        }
+        .transaction-list-section, .checkout-return-section {
+            background-color: #fff;
+            padding: 1.5em;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative; /* For loader */
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1em;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.5em;
+        }
+        .section-header h2 {
+            margin: 0;
+            color: #333;
+            font-size: 1.4em;
+        }
+        .search-filter-container {
+            display: flex;
+            gap: 1em;
+            margin-bottom: 1em;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .search-bar {
+            flex-grow: 1;
+        }
+        .search-bar input[type="text"] {
+            width: calc(100% - 10px);
+            padding: 0.5em;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .filter-group label {
+            margin-right: 0.5em;
+            font-size: 0.9em;
+            color: #555;
+        }
+        .filter-group select {
+            padding: 0.5em;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 1em;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 0.8em;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+        }
+        th {
+            background-color: #f8f8f8;
+            font-weight: bold;
+            color: #555;
+        }
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+        .actions button {
+            padding: 0.5em 0.8em;
+            margin-left: 0.5em;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        .pagination {
+            margin-top: 1em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .pagination button {
+            padding: 0.5em 0.8em;
+            margin: 0 0.3em;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .pagination span {
+            margin: 0 1em;
+        }
+        .form-group {
+            margin-bottom: 1em;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.3em;
+            font-weight: bold;
+            color: #555;
+        }
+        .form-group select,
+        .form-group input[type="date"] {
+            width: calc(100% - 10px);
+            padding: 0.5em;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .form-actions {
+            display: flex;
+            gap: 1em;
+            justify-content: flex-end;
+            margin-top: 1em;
+        }
+        .form-actions button {
+            padding: 0.8em 1.2em;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        .checkout-book-section, .return-book-section {
+            margin-bottom: 2em;
+            padding: 1.5em;
+            border: 1px solid #eee;
+            border-radius: 8px;
+        }
+        .overdue { color: red; font-weight: bold; }
+        .returned { color: green; font-weight: bold; }
+        .active { color: orange; font-weight: bold; }
+        .lost { color: darkred; font-weight: bold; }
+        .fine-amount { font-weight: bold; }
+        /* Loader Styles */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+        .loader {
+            border: 5px solid #f3f3f3; /* Light grey border */
+            border-top: 5px solid #3498db; /* Blue border-top */
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* Alert Styles */
+        .alert-popup {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #4CAF50; /* Success color */
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 11;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+        .alert-popup.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .alert-popup.error {
+            background-color: #f44336; /* Error color */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Library Management System</h1>
+        <nav>
+            <ul>
+                <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="books.html"><i class="fas fa-book"></i> Books</a></li>
+                <li><a href="members.html"><i class="fas fa-users"></i> Members</a></li>
+                <li><a href="transactions.html" class="active"><i class="fas fa-exchange-alt"></i> Transactions</a></li>
+                <li><a href="reports.html"><i class="fas fa-chart-bar"></i> Reports</a></li>
+                <li><button id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section class="transaction-list-section">
+            <div class="loading-overlay" id="transactionsTableLoading" style="display: none;">
+                <div class="loader"></div>
+            </div>
+            <div class="section-header">
+                <h2>Transaction History</h2>
+            </div>
+            <div class="search-filter-container">
+                <div class="search-bar">
+                    <input type="text" id="transactionSearch" placeholder="Search by member or book">
+                </div>
+                <div class="filter-group">
+                    <label for="statusFilter">Status:</label>
+                    <select id="statusFilter">
+                        <option value="all">All Statuses</option>
+                        <option value="active">Active</option>
+                        <option value="returned">Returned</option>
+                        <option value="overdue">Overdue</option>
+                        <option value="lost">Lost</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="sortBy">Sort By:</label>
+                    <select id="sortBy">
+                        <option value="date_newest">Date (Newest)</option>
+                        <option value="date_oldest">Date (Oldest)</option>
+                        <option value="due_date">Due Date</option>
+                        <option value="member_name">Member Name</option>
+                    </select>
+                </div>
+            </div>
+            <div class="table-container">
+                <table id="transactionsTable">
+                    <thead>
+                        <tr>
+                            <th>Member</th>
+                            <th>Book</th>
+                            <th>Checkout Date</th>
+                            <th>Due Date</th>
+                            <th>Return Date</th>
+                            <th>Status</th>
+                            <th>Fine (₹)</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionsTableBody">
+                        </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <button id="prevPage" disabled><i class="fas fa-chevron-left"></i></button>
+                <span id="pageInfo">Page 1 of 1</span>
+                <button id="nextPage" disabled><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </section>
+
+        <section class="checkout-return-section">
+            <div class="loading-overlay" id="checkoutReturnLoading" style="display: none;">
+                <div class="loader"></div>
+            </div>
+            <div class="section-header">
+                <h2>Checkout Book</h2>
+            </div>
+            <div class="checkout-book-section">
+                <h3>Checkout New Book</h3>
+                <form id="checkoutForm">
+                    <div class="form-group">
+                        <label for="checkoutMember">Select Member*</label>
+                        <select id="checkoutMember" required>
+                            <option value="">-- Select Member --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="checkoutBook">Select Book*</label>
+                        <select id="checkoutBook" required>
+                            <option value="">-- Select Book --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="checkoutDate">Checkout Date*</label>
+                        <input type="date" id="checkoutDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="dueDate">Due Date*</label>
+                        <input type="date" id="dueDate" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="cancel-btn" id="cancelCheckout">Cancel</button>
+                        <button type="submit" class="save-btn" id="completeCheckout">Complete Checkout</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="section-header">
+                <h2>Return Book</h2>
+            </div>
+            <div class="return-book-section">
+                <h3>Return Existing Book</h3>
+                <form id="returnForm">
+                    <div class="form-group">
+                        <label for="returnTransaction">Select Transaction*</label>
+                        <select id="returnTransaction" required>
+                            <option value="">-- Select Transaction --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="returnDate">Return Date*</label>
+                        <input type="date" id="returnDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="overdueDays">Overdue Days:</label>
+                        <input type="text" id="overdueDays" value="0" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="calculatedFine">Calculated Fine (₹):</label>
+                        <input type="text" id="calculatedFine" value="0" readonly>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="cancel-btn" id="cancelReturn">Cancel</button>
+                        <button type="submit" class="save-btn" id="processReturn">Process Return</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <div id="alertPopup" class="alert-popup"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBPQ67r9mMz-x8fOCXozbVGMW_de81b0_8",
+            authDomain: "stakehub-fc6be.firebaseapp.com",
+            databaseURL: "https://stakehub-fc6be-default-rtdb.firebaseio.com",
+            projectId: "stakehub-fc6be",
+            storageBucket: "stakehub-fc6be.appspot.com",
+            messagingSenderId: "990758331124",
+            appId: "1:990758331124:android:11851d9fb54fa6d8eef4a1"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Get references to Firebase Realtime Database
+        const transactionsRef = firebase.database().ref('transactions');
+        const membersRef = firebase.database().ref('members');
+        const booksRef = firebase.database().ref('books');
+
+        // DOM elements
+        const transactionsTableBody = document.getElementById('transactionsTableBody');
+        const transactionSearchInput = document.getElementById('transactionSearch');
+        const statusFilterSelect = document.getElementById('statusFilter');
+        const sortBySelect = document.getElementById('sortBy');
+        const prevPageButton = document.getElementById('prevPage');
+        const nextPageButton = document.getElementById('nextPage');
+        const pageInfoSpan = document.getElementById('pageInfo');
+        const transactionsTableLoading = document.getElementById('transactionsTableLoading');
+        const checkoutReturnLoading = document.getElementById('checkoutReturnLoading');
+        const alertPopup = document.getElementById('alertPopup');
+
+        // Checkout form elements
+        const checkoutForm = document.getElementById('checkoutForm');
+        const checkoutMemberSelect = document.getElementById('checkoutMember');
+        const checkoutBookSelect = document.getElementById('checkoutBook');
+        const checkoutDateInput = document.getElementById('checkoutDate');
+        const dueDateInput = document.getElementById('dueDate');
+        const completeCheckoutButton = document.getElementById('completeCheckout');
+        const cancelCheckoutButton = document.getElementById('cancelCheckout');
+
+        // Return form elements
+        const returnForm = document.getElementById('returnForm');
+        const returnTransactionSelect = document.getElementById('returnTransaction');
+        const returnDateInput = document.getElementById('returnDate');
+        const overdueDaysInput = document.getElementById('overdueDays');
+        const calculatedFineInput = document.getElementById('calculatedFine');
+        const processReturnButton = document.getElementById('processReturn');
+        const cancelReturnButton = document.getElementById('cancelReturn');
+
+        // State variables for transactions
+        let allTransactions = [];
+        let filteredTransactions = [];
+        const transactionsPerPage = 10;
+        let currentTransactionPage = 1;
+        let currentTransactionStatusFilter = 'all';
+        let currentTransactionSortBy = 'date_newest';
+        let currentTransactionSearchTerm = '';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            firebase.auth().onAuthStateChanged(user => {
+                if (user) {
+                    loadTransactions();
+                    loadMembersForCheckout();
+                    loadBooksForCheckout();
+                    setupEventListeners();
+                } else {
+                    window.location.href = 'index.html';
+                }
+            });
+        });
+
+        function showLoading(element) {
+            element.style.display = 'flex';
+        }
+
+        function hideLoading(element) {
+            element.style.display = 'none';
+        }
+
+        function showAlert(message, type = 'success') {
+            alertPopup.textContent = message;
+            alertPopup.className = `alert-popup show ${type}`;
+            setTimeout(() => {
+                alertPopup.classList.remove('show');
+            }, 3000);
+        }
+
+        function loadTransactions() {
+            showLoading(transactionsTableLoading);
+            transactionsRef.once('value', snapshot => {
+                const transactionsData = snapshot.val();
+                allTransactions = transactionsData ? Object.keys(transactionsData).map(key => ({ id: key, ...transactionsData[key] })) : [];
+                applyTransactionFilters();
+                hideLoading(transactionsTableLoading);
+            }, error => {
+                console.error('Error loading transactions:', error);
+                showAlert('Failed to load transactions.', 'error');
+                hideLoading(transactionsTableLoading);
+            });
+        }
+
+        function loadMembersForCheckout() {
+            membersRef.once('value', snapshot => {
+                const membersData = snapshot.val();
+                if (membersData) {
+                    Object.keys(membersData).forEach(memberId => {
+                        const member = membersData[memberId];
+                        const option = document.createElement('option');
+                        option.value = memberId;
+                        option.textContent = member.name;
+                        checkoutMemberSelect.appendChild(option);
+                    });
+                }
+            });
+        }
+
+        function loadBooksForCheckout() {
+            booksRef.once('value', snapshot => {
+                const booksData = snapshot.val();
+                if (booksData) {
+                    Object.keys(booksData).forEach(bookId => {
+                        const book = booksData[bookId];
+                        const option = document.createElement('option');
+                        option.value = bookId;
+                        option.textContent = book.title;
+                        checkoutBookSelect.appendChild(option);
+                    });
+                }
+            });
+        }
+
+        function loadTransactionsForReturn() {
+            returnTransactionSelect.innerHTML = '<option value="">-- Select Transaction --</option>';
+            transactionsRef.orderByChild('status').equalTo('active').once('value', snapshot => {
+                const activeTransactions = snapshot.val();
+                if (activeTransactions) {
+                    Promise.all(Object.keys(activeTransactions).map(transactionId => {
+                        const transaction = activeTransactions[transactionId];
+                        return Promise.all([
+                            membersRef.child(transaction.memberId).once('value'),
+                            booksRef.child(transaction.bookId).once('value')
+                        ]).then(([memberSnapshot, bookSnapshot]) => {
+                            const member = memberSnapshot.val();
+                            const book = bookSnapshot.val();
+                            if (member && book) {
+                                const option = document.createElement('option');
+                                option.value = transactionId;
+                                option.textContent = `${member.name} - ${book.title} (Checked out: ${transaction.checkoutDate})`;
+                                returnTransactionSelect.appendChild(option);
+                            }
+                        });
+                    })).catch(error => {
+                        console.error('Error loading data for return:', error);
+                        showAlert('Failed to load data for return.', 'error');
+                    });
+                }
+            });
+        }
+
+        function applyTransactionFilters() {
+            showLoading(transactionsTableLoading);
+            currentTransactionStatusFilter = statusFilterSelect.value;
+            currentTransactionSortBy = sortBySelect.value;
+            currentTransactionSearchTerm = transactionSearchInput.value.trim().toLowerCase();
+
+            filteredTransactions = allTransactions.filter(transaction => {
+                const statusMatch = currentTransactionStatusFilter === 'all' || transaction.status === currentTransactionStatusFilter;
+                const searchMatch = !currentTransactionSearchTerm ||
+                                      (transaction.memberName && transaction.memberName.toLowerCase().includes(currentTransactionSearchTerm)) ||
+                                      (transaction.bookTitle && transaction.bookTitle.toLowerCase().includes(currentTransactionSearchTerm));
+                return statusMatch && searchMatch;
+            });
+
+            sortTransactions();
+            renderTransactionsTable();
+            updateTransactionPagination();
+            hideLoading(transactionsTableLoading);
+        }
+
+        function sortTransactions() {
+            filteredTransactions.sort((a, b) => {
+                switch (currentTransactionSortBy) {
+                    case 'date_newest':
+                        return new Date(b.checkoutDate) - new Date(a.checkoutDate);
+                    case 'date_oldest':
+                        return new Date(a.checkoutDate) - new Date(b.checkoutDate);
+                    case 'due_date':
+                        return new Date(a.dueDate) - new Date(b.dueDate);
+                    case 'member_name':
+                        return a.memberName.localeCompare(b.memberName);
+                    default:
+                        return new Date(b.checkoutDate) - new Date(a.checkoutDate);
+                }
+            });
+        }
+
+        function renderTransactionsTable() {
+            const startIndex = (currentTransactionPage - 1) * transactionsPerPage;
+            const endIndex = Math.min(startIndex + transactionsPerPage, filteredTransactions.length);
+            const currentTransactions = filteredTransactions.slice(startIndex, endIndex);
+
+            transactionsTableBody.innerHTML = '';
+
+            if (currentTransactions.length === 0) {
+                const row = transactionsTableBody.insertRow();
+                const cell = row.insertCell();
+                cell.colSpan = 8;
+                cell.textContent = 'No transactions found matching your criteria.';
+                return;
+            }
+
+            currentTransactions.forEach(transaction => {
+                const row = transactionsTableBody.insertRow();
+                row.insertCell().textContent = transaction.memberName || 'N/A';
+                row.insertCell().textContent = transaction.bookTitle || 'N/A';
+                row.insertCell().textContent = transaction.checkoutDate || 'N/A';
+                row.insertCell().textContent = transaction.dueDate || 'N/A';
+                row.insertCell().textContent = transaction.returnDate || 'N/A';
+
+                const statusCell = row.insertCell();
+                statusCell.textContent = transaction.status ? transaction.status.toUpperCase() : 'N/A';
+                statusCell.className = transaction.status;
+
+                const fineCell = row.insertCell();
+                fineCell.textContent = transaction.fineAmount !== undefined ? transaction.fineAmount : 'N/A';
+
+                const actionsCell = row.insertCell();
+                if (transaction.status === 'active') {
+                    const returnButton = document.createElement('button');
+                    returnButton.className = 'save-btn';
+                    returnButton.textContent = 'Return';
+                    returnButton.addEventListener('click', () => populateReturnForm(transaction.id));
+                    actionsCell.appendChild(returnButton);
+                }
+            });
+        }
+
+        function updateTransactionPagination() {
+            const totalPages = Math.ceil(filteredTransactions.length / transactionsPerPage);
+            pageInfoSpan.textContent = `Page ${currentTransactionPage} of ${totalPages}`;
+            prevPageButton.disabled = currentTransactionPage <= 1;
+            nextPageButton.disabled = currentTransactionPage >= totalPages;
+        }
+
+        function setupEventListeners() {
+            transactionSearchInput.addEventListener('input', applyTransactionFilters);
+            statusFilterSelect.addEventListener('change', applyTransactionFilters);
+            sortBySelect.addEventListener('change', applyTransactionFilters);
+
+            prevPageButton.addEventListener('click', () => {
+                if (currentTransactionPage > 1) {
+                    currentTransactionPage--;
+                    renderTransactionsTable();
+                    updateTransactionPagination();
+                }
+            });
+
+            nextPageButton.addEventListener('click', () => {
+                const totalPages = Math.ceil(filteredTransactions.length / transactionsPerPage);
+                if (currentTransactionPage < totalPages) {
+                    currentTransactionPage++;
+                    renderTransactionsTable();
+                    updateTransactionPagination();
+                }
+            });
+
+            checkoutForm.addEventListener('submit', handleCheckout);
+            returnForm.addEventListener('submit', handleReturn);
+            returnDateInput.addEventListener('change', calculateFine);
+            cancelCheckoutButton.addEventListener('click', checkoutForm.reset.bind(checkoutForm));
+            cancelReturnButton.addEventListener('click', returnForm.reset.bind(returnForm));
+
+            const logoutBtn = document.getElementById('logoutBtn');
+            logoutBtn.addEventListener('click', () => {
+                firebase.auth().signOut()
+                    .then(() => {
+                        window.location.href = 'index.html';
+                    }).catch((error) => {
+                        console.error('Logout failed:', error);
+                        showAlert('Logout failed. Please try again.', 'error');
+                    });
+            });
+        }
+
+        async function handleCheckout(event) {
+            event.preventDefault();
+            showLoading(checkoutReturnLoading);
+
+            const memberId = checkoutMemberSelect.value;
+            const bookId = checkoutBookSelect.value;
+            const checkoutDate = checkoutDateInput.value;
+            const dueDate = dueDateInput.value;
+
+            if (!memberId || !bookId || !checkoutDate || !dueDate) {
+                showAlert('Please fill in all checkout details.', 'error');
+                hideLoading(checkoutReturnLoading);
+                return;
+            }
+
+            try {
+                const memberSnapshot = await membersRef.child(memberId).once('value');
+                const bookSnapshot = await booksRef.child(bookId).once('value');
+
+                if (!memberSnapshot.exists() || !bookSnapshot.exists()) {
+                    showAlert('Selected member or book does not exist.', 'error');
+                    hideLoading(checkoutReturnLoading);
+                    return;
+                }
+
+                const memberName = memberSnapshot.val().name;
+                const bookTitle = bookSnapshot.val().title;
+
+                const newTransaction = {
+                    memberId: memberId,
+                    memberName: memberName,
+                    bookId: bookId,
+                    bookTitle: bookTitle,
+                    checkoutDate: checkoutDate,
+                    dueDate: dueDate,
+                    returnDate: null,
+                    status: 'active',
+                    fineAmount: 0
+                };
+
+                await transactionsRef.push(newTransaction);
+                showAlert('Book checked out successfully!');
+                checkoutForm.reset();
+                loadTransactions();
+                loadTransactionsForReturn(); // Update return form options
+            } catch (error) {
+                console.error('Error checking out book:', error);
+                showAlert('Failed to checkout book.', 'error');
+            } finally {
+                hideLoading(checkoutReturnLoading);
+            }
+        }
+
+        function populateReturnForm(transactionId) {
+            returnTransactionSelect.value = transactionId;
+            returnDateInput.valueAsDate = new Date();
+            calculateFine();
+        }
+
+        function calculateFine() {
+            const selectedTransactionId = returnTransactionSelect.value;
+            const returnDateStr = returnDateInput.value;
+
+            if (!selectedTransactionId || !returnDateStr) {
+                overdueDaysInput.value = 0;
+                calculatedFineInput.value = 0;
+                return;
+            }
+
+            transactionsRef.child(selectedTransactionId).once('value', snapshot => {
+                const transaction = snapshot.val();
+                if (transaction && transaction.dueDate) {
+                    const dueDate = new Date(transaction.dueDate);
+                    const returnDate = new Date(returnDateStr);
+
+                    if (returnDate > dueDate) {
+                        const timeDiff = Math.abs(returnDate.getTime() - dueDate.getTime());
+                        const overdueDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                        overdueDaysInput.value = overdueDays;
+                        calculatedFineInput.value = overdueDays * 5;
+                    } else {
+                        overdueDaysInput.value = 0;
+                        calculatedFineInput.value = 0;
+                    }
+                }
+            });
+        }
+
+        async function handleReturn(event) {
+            event.preventDefault();
+            showLoading(checkoutReturnLoading);
+
+            const transactionId = returnTransactionSelect.value;
+            const returnDate = returnDateInput.value;
+            const fineAmount = parseFloat(calculatedFineInput.value);
+
+            if (!transactionId || !returnDate) {
+                showAlert('Please select a transaction and enter the return date.', 'error');
+                hideLoading(checkoutReturnLoading);
+                return;
+            }
+
+            try {
+                await transactionsRef.child(transactionId).update({
+                    returnDate: returnDate,
+                    status: 'returned',
+                    fineAmount: fineAmount
+                });
+                showAlert('Book returned successfully!');
+                returnForm.reset();
+                loadTransactions();
+                loadTransactionsForReturn(); // Update return form options
+            } catch (error) {
+                console.error('Error returning book:', error);
+                showAlert('Failed to return book.', 'error');
+            } finally {
+                hideLoading(checkoutReturnLoading);
+            }
+        }
+    </script>
+</body>
+</html>

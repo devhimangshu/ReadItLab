@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Registration</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            display: flex; /* Align icon and text */
+            align-items: center;
+        }
+        label i {
+            margin-right: 8px; /* Space between icon and text */
+            color: #007bff; /* Icon color */
+        }
+        input[type="email"],
+        input[type="password"],
+        input[type="text"],
+        input[type="tel"],
+        input[type="file"] {
+            width: calc(100% - 12px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .file-upload-wrapper {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            color: #555;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            margin-top: 5px;
+            display: flex; /* Align icon and text */
+            align-items: center;
+            justify-content: center;
+        }
+        .file-upload-wrapper i {
+            margin-right: 8px; /* Space between icon and text */
+            color: #007bff; /* Icon color */
+        }
+        .file-upload-wrapper input[type=file] {
+            font-size: 100px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .file-upload-text {
+            display: inline-block;
+            padding-left: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            display: flex; /* Align icon and text */
+            align-items: center;
+            justify-content: center;
+        }
+        button i {
+            margin-right: 8px; /* Space between icon and text */
+        }
+        p {
+            text-align: center;
+            margin-top: 10px;
+            color: #777;
+            font-size: 14px;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        /* Bottom Right Alert Popup Styles */
+        .popup {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: none;
+            border-left: 5px solid #28a745; /* Example accent color */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+        .popup p {
+            margin: 0;
+            flex-grow: 1;
+        }
+        .popup button {
+            background: none;
+            border: none;
+            color: #777;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: 15px;
+        }
+        .popup button:hover {
+            color: #333;
+        }
+        /* Loading Buffer Styles */
+        .loading-buffer {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            z-index: 999;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+            margin-bottom: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Admin Registration</h2>
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="registerName"><i class="fas fa-user"></i> Full Name:</label>
+                <input type="text" id="registerName" required>
+            </div>
+            <div class="form-group">
+                <label for="registerEmail"><i class="fas fa-envelope"></i> Email:</label>
+                <input type="email" id="registerEmail" required>
+            </div>
+            <div class="form-group">
+                <label for="registerPhone"><i class="fas fa-phone"></i> Phone:</label>
+                <input type="tel" id="registerPhone" required>
+            </div>
+            <div class="form-group">
+                <label for="registerImage"><i class="fas fa-image"></i> Profile Image:</label>
+                <div class="file-upload-wrapper">
+                    <input type="file" id="registerImage" accept="image/*" required onchange="updateFileName(this)">
+                    <i class="fas fa-upload"></i>
+                    <span>Choose File</span>
+                    <span id="file-name" class="file-upload-text"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="registerPassword"><i class="fas fa-lock"></i> Password:</label>
+                <input type="password" id="registerPassword" required>
+            </div>
+            <button type="submit"><i class="fas fa-user-plus"></i> Register</button>
+            <p>Already have an account? <a href="index.html"><i class="fas fa-sign-in-alt"></i> Login</a></p>
+        </form>
+        <div id="alert-popup" class="popup">
+            <p id="alert-message"></p>
+            <button onclick="closePopup()"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="loading-buffer" class="loading-buffer">
+            <div class="spinner"></div>
+            <p><i class="fas fa-spinner fa-spin mr-2"></i> Registering...</p>
+        </div>
+    </div>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBPQ67r9mMz-x8fOCXozbVGMW_de81b0_8",
+            authDomain: "stakehub-fc6be.firebaseapp.com",
+            databaseURL: "https://stakehub-fc6be-default-rtdb.firebaseio.com",
+            projectId: "stakehub-fc6be",
+            storageBucket: "stakehub-fc6be.appspot.com",
+            messagingSenderId: "990758331124",
+            appId: "1:990758331124:android:11851d9fb54fa6d8eef4a1"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+        const storage = firebase.storage();
+
+        // Get form elements
+        const registerForm = document.getElementById('registerForm');
+        const alertPopup = document.getElementById('alert-popup');
+        const alertMessage = document.getElementById('alert-message');
+        const loadingBuffer = document.getElementById('loading-buffer');
+        const fileNameDisplay = document.getElementById('file-name');
+
+        // Function to show the alert popup at the bottom right
+        function showAlert(message) {
+            alertMessage.textContent = message;
+            alertPopup.style.display = 'flex';
+        }
+
+        // Function to close the alert popup
+        function closePopup() {
+            alertPopup.style.display = 'none';
+        }
+
+        // Function to show the loading buffer
+        function showLoadingBuffer() {
+            loadingBuffer.style.display = 'flex';
+        }
+
+        // Function to hide the loading buffer
+        function hideLoadingBuffer() {
+            loadingBuffer.style.display = 'none';
+        }
+
+        // Initially hide the alert popup
+        alertPopup.style.display = 'none';
+
+        // Function to update the displayed file name
+        function updateFileName(input) {
+            if (input.files && input.files[0]) {
+                fileNameDisplay.textContent = input.files[0].name;
+            } else {
+                fileNameDisplay.textContent = '';
+            }
+        }
+
+        // Event listener for register form submission
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = registerForm.registerName.value;
+            const email = registerForm.registerEmail.value;
+            const phone = registerForm.registerPhone.value;
+            const password = registerForm.registerPassword.value;
+            const imageFile = registerForm.registerImage.files[0];
+
+            if (!imageFile) {
+                showAlert('Please upload a profile image.');
+                return;
+            }
+
+            showLoadingBuffer();
+
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    const storageRef = storage.ref('admin-profiles/' + user.uid + '/' + imageFile.name);
+                    const uploadTask = storageRef.put(imageFile);
+
+                    uploadTask.then((snapshot) => {
+                        snapshot.ref.getDownloadURL().then((downloadURL) => {
+                            // Store admin details in Realtime Database
+                            db.ref('admins/' + user.uid).set({
+                                uid: user.uid,
+                                fullName: name,
+                                email: email,
+                                phone: phone,
+                                profileImageURL: downloadURL,
+                                status: 'Pending' // Initial status
+                            }).then(() => {
+                                hideLoadingBuffer();
+                                showAlert('Registration successful! Your account needs to be verified by an administrator.');
+                                registerForm.reset();
+                                window.location.href = 'index.html'; // Redirect to login
+                            }).catch((error) => {
+                                hideLoadingBuffer();
+                                showAlert('Error saving admin data: ' + error.message);
+                                user.delete().catch(console.error);
+                            });
+                        });
+                    }).catch((error) => {
+                        hideLoadingBuffer();
+                        showAlert('Error uploading profile image: ' + error.message);
+                        user.delete().catch(console.error);
+                    });
+                })
+                .catch((error) => {
+                    hideLoadingBuffer();
+                    let errorMessage = '';
+                    if (error.code === 'auth/email-already-in-use') {
+                        errorMessage = 'This email is already in use.';
+                    } else if (error.code === 'auth/invalid-email') {
+                        errorMessage = 'Invalid email address.';
+                    } else if (error.code === 'auth/weak-password') {
+                        errorMessage = 'Password should be at least 6 characters.';
+                    } else {
+                        errorMessage = 'Registration failed: ' + error.message;
+                    }
+                    showAlert(errorMessage);
+                });
+        });
+    </script>
+</body>
+</html>
