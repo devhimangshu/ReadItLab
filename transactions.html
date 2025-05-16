@@ -168,7 +168,9 @@
             color: #555;
         }
         .form-group select,
-        .form-group input[type="date"] {
+        .form-group input[type="date"],
+        .form-group input[type="number"],
+        .form-group input[type="text"] {
             width: calc(100% - 10px);
             padding: 0.5em;
             border: 1px solid #ccc;
@@ -309,7 +311,7 @@
                         </tr>
                     </thead>
                     <tbody id="transactionsTableBody">
-                        </tbody>
+                    </tbody>
                 </table>
             </div>
             <div class="pagination">
@@ -330,12 +332,16 @@
                 <h3>Checkout New Book</h3>
                 <form id="checkoutForm">
                     <div class="form-group">
+                        <label for="searchMember">Search Member:</label>
+                        <input type="text" id="searchMember" placeholder="Enter member name or ID">
                         <label for="checkoutMember">Select Member*</label>
                         <select id="checkoutMember" required>
                             <option value="">-- Select Member --</option>
                         </select>
                     </div>
                     <div class="form-group">
+                        <label for="searchBook">Search Book:</label>
+                        <input type="text" id="searchBook" placeholder="Enter book title, author, or ISBN">
                         <label for="checkoutBook">Select Book*</label>
                         <select id="checkoutBook" required>
                             <option value="">-- Select Book --</option>
@@ -344,6 +350,10 @@
                     <div class="form-group">
                         <label for="checkoutDate">Checkout Date*</label>
                         <input type="date" id="checkoutDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loanDays">Loan Duration (Days):</label>
+                        <input type="number" id="loanDays" min="1" value="7">
                     </div>
                     <div class="form-group">
                         <label for="dueDate">Due Date*</label>
@@ -394,7 +404,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
     <script>
         // Firebase Configuration
         const firebaseConfig = {
@@ -417,7 +426,7 @@
 
         // DOM elements
         const transactionsTableBody = document.getElementById('transactionsTableBody');
-        const transactionSearchInput = document.getElementById('transactionSearch');
+        const transactionSearchInput= document.getElementById('transactionSearch');
         const statusFilterSelect = document.getElementById('statusFilter');
         const sortBySelect = document.getElementById('sortBy');
         const prevPageButton = document.getElementById('prevPage');
@@ -429,9 +438,12 @@
 
         // Checkout form elements
         const checkoutForm = document.getElementById('checkoutForm');
+        const searchMemberInput = document.getElementById('searchMember');
         const checkoutMemberSelect = document.getElementById('checkoutMember');
+        const searchBookInput = document.getElementById('searchBook');
         const checkoutBookSelect = document.getElementById('checkoutBook');
         const checkoutDateInput = document.getElementById('checkoutDate');
+        const loanDaysInput = document.getElementById('loanDays');
         const dueDateInput = document.getElementById('dueDate');
         const completeCheckoutButton = document.getElementById('completeCheckout');
         const cancelCheckoutButton = document.getElementById('cancelCheckout');
@@ -453,6 +465,8 @@
         let currentTransactionStatusFilter = 'all';
         let currentTransactionSortBy = 'date_newest';
         let currentTransactionSearchTerm = '';
+        let allMembers = [];
+        let allBooks = [];
 
         document.addEventListener('DOMContentLoaded', () => {
             firebase.auth().onAuthStateChanged(user => {
@@ -460,7 +474,11 @@
                     loadTransactions();
                     loadMembersForCheckout();
                     loadBooksForCheckout();
+                    loadTransactionsForReturn();
                     setupEventListeners();
+                    // Set initial checkout date to today
+                    checkoutDateInput.valueAsDate = new Date();
+                    calculateDueDate();
                 } else {
                     window.location.href = 'index.html';
                 }
@@ -500,30 +518,36 @@
         function loadMembersForCheckout() {
             membersRef.once('value', snapshot => {
                 const membersData = snapshot.val();
-                if (membersData) {
-                    Object.keys(membersData).forEach(memberId => {
-                        const member = membersData[memberId];
-                        const option = document.createElement('option');
-                        option.value = memberId;
-                        option.textContent = member.name;
-                        checkoutMemberSelect.appendChild(option);
-                    });
-                }
+                allMembers = membersData ? Object.keys(membersData).map(key => ({ id: key, ...membersData[key] })) : [];
+                populateMemberList(allMembers);
             });
         }
 
         function loadBooksForCheckout() {
             booksRef.once('value', snapshot => {
                 const booksData = snapshot.val();
-                if (booksData) {
-                    Object.keys(booksData).forEach(bookId => {
-                        const book = booksData[bookId];
-                        const option = document.createElement('option');
-                        option.value = bookId;
-                        option.textContent = book.title;
-                        checkoutBookSelect.appendChild(option);
-                    });
-                }
+                allBooks = booksData ? Object.keys(booksData).map(key => ({ id: key, ...booksData[key] })) : [];
+                populateBookList(allBooks);
+            });
+        }
+
+        function populateMemberList(members) {
+            checkoutMemberSelect.innerHTML = '<option value="">-- Select Member --</option>';
+            members.forEach(member => {
+                const option = document.createElement('option');
+                option.value = member.id;
+                option.textContent = member.name + (member.idNumber ? ` (${member.idNumber})` : '');
+                checkoutMemberSelect.appendChild(option);
+            });
+        }
+
+        function populateBookList(books) {
+            checkoutBookSelect.innerHTML = '<option value="">-- Select Book --</option>';
+            books.forEach(book => {
+                const option = document.createElement('option');
+                option.value = book.id;
+                option.textContent = book.title + (book.author ? ` by ${book.author}` : '') + (book.isbn ? ` (${book.isbn})` : '');
+                checkoutBookSelect.appendChild(option);
             });
         }
 
@@ -564,8 +588,8 @@
             filteredTransactions = allTransactions.filter(transaction => {
                 const statusMatch = currentTransactionStatusFilter === 'all' || transaction.status === currentTransactionStatusFilter;
                 const searchMatch = !currentTransactionSearchTerm ||
-                                      (transaction.memberName && transaction.memberName.toLowerCase().includes(currentTransactionSearchTerm)) ||
-                                      (transaction.bookTitle && transaction.bookTitle.toLowerCase().includes(currentTransactionSearchTerm));
+                                    (transaction.memberName && transaction.memberName.toLowerCase().includes(currentTransactionSearchTerm)) ||
+                                    (transaction.bookTitle && transaction.bookTitle.toLowerCase().includes(currentTransactionSearchTerm));
                 return statusMatch && searchMatch;
             });
 
@@ -662,6 +686,54 @@
                 }
             });
 
+            // --- Member Search in Dropdown ---
+            searchMemberInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                Array.from(checkoutMemberSelect.options).forEach(option => {
+                    option.style.display = option.text.toLowerCase().includes(searchTerm) ? 'block' : 'none';
+                });
+                // Ensure the dropdown is visible while searching
+                checkoutMemberSelect.size = Array.from(checkoutMemberSelect.options).filter(option => option.style.display === 'block').length;
+                if (searchTerm.length === 0) {
+                    checkoutMemberSelect.size = 1; // Reset size when search is empty
+                }
+            });
+            checkoutMemberSelect.addEventListener('blur', () => {
+                setTimeout(() => {
+                    checkoutMemberSelect.size = 1; // Collapse dropdown after a short delay
+                }, 200);
+            });
+            checkoutMemberSelect.addEventListener('change', () => {
+                searchMemberInput.value = checkoutMemberSelect.options[checkoutMemberSelect.selectedIndex].text;
+                checkoutMemberSelect.size = 1; // Collapse on selection
+            });
+
+            // --- Book Search in Dropdown ---
+            searchBookInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                Array.from(checkoutBookSelect.options).forEach(option => {
+                    option.style.display = option.text.toLowerCase().includes(searchTerm) ? 'block' : 'none';
+                });
+                // Ensure the dropdown is visible while searching
+                checkoutBookSelect.size = Array.from(checkoutBookSelect.options).filter(option => option.style.display === 'block').length;
+                if (searchTerm.length === 0) {
+                    checkoutBookSelect.size = 1; // Reset size when search is empty
+                }
+            });
+            checkoutBookSelect.addEventListener('blur', () => {
+                setTimeout(() => {
+                    checkoutBookSelect.size = 1; // Collapse dropdown after a short delay
+                }, 200);
+            });
+            checkoutBookSelect.addEventListener('change', () => {
+                searchBookInput.value = checkoutBookSelect.options[checkoutBookSelect.selectedIndex].text;
+                checkoutBookSelect.size = 1; // Collapse on selection
+            });
+
+            // --- Loan Duration and Due Date Calculation ---
+            loanDaysInput.addEventListener('input', calculateDueDate);
+            checkoutDateInput.addEventListener('change', calculateDueDate); // Recalculate if checkout date changes
+
             checkoutForm.addEventListener('submit', handleCheckout);
             returnForm.addEventListener('submit', handleReturn);
             returnDateInput.addEventListener('change', calculateFine);
@@ -678,6 +750,29 @@
                         showAlert('Logout failed. Please try again.', 'error');
                     });
             });
+
+            // Set the initial due date based on the default loan duration
+            calculateDueDate();
+        }
+
+        function calculateDueDate() {
+            const checkoutDateValue = checkoutDateInput.value;
+            const loanDays = parseInt(loanDaysInput.value);
+
+            if (checkoutDateValue && !isNaN(loanDays) && loanDays > 0) {
+                const checkoutDate = new Date(checkoutDateValue);
+                const dueDate = new Date(checkoutDate);
+                dueDate.setDate(checkoutDate.getDate() + loanDays);
+
+                const year = dueDate.getFullYear();
+                const month = (dueDate.getMonth() + 1).toString().padStart(2, '0');
+                const day = dueDate.getDate().toString().padStart(2, '0');
+
+                dueDateInput.value = `${year}-${month}-${day}`;
+            } else {
+                // If loan days is not a valid positive number, clear the due date
+                dueDateInput.value = '';
+            }
         }
 
         async function handleCheckout(event) {
@@ -689,25 +784,18 @@
             const checkoutDate = checkoutDateInput.value;
             const dueDate = dueDateInput.value;
 
-            if (!memberId || !bookId || !checkoutDate || !dueDate) {
-                showAlert('Please fill in all checkout details.', 'error');
+            const selectedMemberOption = checkoutMemberSelect.options[checkoutMemberSelect.selectedIndex];
+            const memberName = selectedMemberOption ? selectedMemberOption.textContent.split('(')[0].trim() : null;
+            const selectedBookOption = checkoutBookSelect.options[checkoutBookSelect.selectedIndex];
+            const bookTitle = selectedBookOption ? selectedBookOption.textContent.split('by')[0].trim() : null;
+
+            if (!memberId || !bookId || !checkoutDate || !dueDate || !memberName || !bookTitle) {
+                showAlert('Please select a member and a book, and ensure checkout and due dates are set.', 'error');
                 hideLoading(checkoutReturnLoading);
                 return;
             }
 
             try {
-                const memberSnapshot = await membersRef.child(memberId).once('value');
-                const bookSnapshot = await booksRef.child(bookId).once('value');
-
-                if (!memberSnapshot.exists() || !bookSnapshot.exists()) {
-                    showAlert('Selected member or book does not exist.', 'error');
-                    hideLoading(checkoutReturnLoading);
-                    return;
-                }
-
-                const memberName = memberSnapshot.val().name;
-                const bookTitle = bookSnapshot.val().title;
-
                 const newTransaction = {
                     memberId: memberId,
                     memberName: memberName,
@@ -723,8 +811,14 @@
                 await transactionsRef.push(newTransaction);
                 showAlert('Book checked out successfully!');
                 checkoutForm.reset();
+                // Reset search inputs and re-populate lists
+                searchMemberInput.value = '';
+                searchBookInput.value = '';
+                loadMembersForCheckout();
+                loadBooksForCheckout();
                 loadTransactions();
                 loadTransactionsForReturn(); // Update return form options
+                calculateDueDate(); // Reset due date
             } catch (error) {
                 console.error('Error checking out book:', error);
                 showAlert('Failed to checkout book.', 'error');
