@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(to bottom, #121212, #333333);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+        color: #ffffff;
+        overflow: hidden;
+    }
+
+    .container {
+        background: rgba(30, 30, 30, 0.85);
+        padding: 40px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+        width: 90%;
+        max-width: 450px;
+        border-top: 3px solid #00ffff;
+        border-bottom: 3px solid #00ffff;
+        position: relative;
+    }
+
+    .container::before {
+        content: '';
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        height: 2px;
+        background: linear-gradient(to right, transparent, #00ffff, transparent);
+        opacity: 0.4;
+    }
+
+    .container::after {
+        content: '';
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+        height: 2px;
+        background: linear-gradient(to right, transparent, #00ffff, transparent);
+        opacity: 0.4;
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #ffffff;
+        font-size: 2.5em;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        color: #cccccc;
+        font-weight: 600;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    label i {
+        color: #ffffff;
+        margin-right: 10px;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    input[type="email"],
+    input[type="password"],
+    button { /* Apply box-sizing to all three */
+        box-sizing: border-box;
+    }
+
+    input[type="email"],
+    input[type="password"] {
+        width: calc(100% - 20px);
+        padding: 12px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border: 2px solid #666666;
+        border-radius: 8px;
+        font-size: 1.1em;
+        color: #ffffff;
+        outline: none;
+        transition: border-color 0.3s ease;
+    }
+
+    input:focus {
+        border-color: #00ffff;
+    }
+
+    button {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(to right, #4d4dff, #ff4da6);
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1.2em;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        outline: none;
+    }
+
+    button i {
+        margin-right: 10px;
+    }
+
+    button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6);
+    }
+
+    p {
+        text-align: center;
+        margin-top: 15px;
+        color: #aaaaaa;
+        font-size: 0.95em;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    a {
+        color: #00ffff;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s ease;
+    }
+
+    a:hover {
+        text-decoration: underline;
+        color: #ffffff;
+    }
+
+    .popup {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: rgba(0, 0, 0, 0.8);
+        color: #ffffff;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        display: none;
+        border-left: 5px solid #00ffff;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 1em;
+    }
+
+    .popup p {
+        margin: 0;
+        flex-grow: 1;
+    }
+
+    .popup button {
+        background: none;
+        border: none;
+        color: #ffffff;
+        cursor: pointer;
+        font-size: 1.2em;
+        margin-left: 15px;
+        opacity: 0.8;
+        transition: opacity 0.2s ease;
+    }
+
+    .popup button:hover {
+        opacity: 1;
+    }
+
+    .loading-buffer {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(0, 0, 0, 0.9);
+        color: #ffffff;
+        padding: 20px;
+        border-radius: 10px;
+        z-index: 999;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .spinner {
+        border: 5px solid rgba(255, 255, 255, 0.3);
+        border-top: 5px solid #00ffff;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 2s linear infinite;
+        margin-bottom: 15px;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .loading-buffer p {
+        font-size: 1.1em;
+        font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding: 30px;
+        }
+
+        h2 {
+            font-size: 2em;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .container {
+            width: 95%;
+            padding: 20px;
+        }
+
+        h2 {
+            font-size: 1.75em;
+        }
+
+        input,
+        button,
+        .popup {
+            font-size: 0.9em;
+        }
+    }
+</style>
+</head>
+<body>
+    <div class="container">
+        <h2><i class="fas fa-user-circle mr-2"></i> Admin Login</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="loginEmail"><i class="fas fa-envelope"></i> Email:</label>
+                <input type="email" id="loginEmail" required>
+            </div>
+            <div class="form-group">
+                <label for="loginPassword"><i class="fas fa-lock"></i> Password:</label>
+                <input type="password" id="loginPassword" required>
+            </div>
+            <button type="submit"><i class="fas fa-sign-in-alt mr-2"></i> Login</button>
+            <p>Don't have an account? <a href="register.html"><i class="fas fa-user-plus mr-1"></i> Register</a></p>
+            <p><a href="forgot_password.html"><i class="fas fa-key mr-1"></i> Forgot Password?</a></p>
+        </form>
+
+        <div id="alert-popup" class="popup">
+            <p id="alert-message"></p>
+            <button onclick="closePopup()"><i class="fas fa-times"></i></button>
+        </div>
+
+        <div id="loading-buffer" class="loading-buffer">
+            <div class="spinner"></div>
+            <p><i class="fas fa-spinner fa-spin mr-2"></i> Logging In...</p>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBPQ67r9mMz-x8fOCXozbVGMW_de81b0_8",
+            authDomain: "stakehub-fc6be.firebaseapp.com",
+            databaseURL: "https://stakehub-fc6be-default-rtdb.firebaseio.com",
+            projectId: "stakehub-fc6be",
+            storageBucket: "stakehub-fc6be.appspot.com",
+            messagingSenderId: "990758331124",
+            appId: "1:990758331124:android:11851d9fb54fa6d8eef4a1"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        // Get form elements
+        const loginForm = document.getElementById('loginForm');
+        const alertPopup = document.getElementById('alert-popup');
+        const alertMessage = document.getElementById('alert-message');
+        const loadingBuffer = document.getElementById('loading-buffer');
+
+        // Function to show the alert popup at the bottom right
+        function showAlert(message, isSuccess = false) {
+            alertMessage.textContent = message;
+            alertPopup.className = 'popup ' + (isSuccess ? 'success' : '');
+            alertPopup.style.display = 'flex';
+        }
+
+        // Function to close the alert popup
+        function closePopup() {
+            alertPopup.style.display = 'none';
+        }
+
+        // Function to show the loading buffer
+        function showLoadingBuffer() {
+            loadingBuffer.style.display = 'flex';
+        }
+
+        // Function to hide the loading buffer
+        function hideLoadingBuffer() {
+            loadingBuffer.style.display = 'none';
+        }
+
+        // Initially hide the alert popup
+        alertPopup.style.display = 'none';
+
+        // Check if the user is already logged in on page load
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // User is signed in. Check their status in the database
+                db.ref('admins/' + user.uid).once('value')
+                    .then((snapshot) => {
+                        const adminData = snapshot.val();
+                        if (adminData && adminData.status === 'Active') {
+                            // **INSECURE REDIRECT WITH UID IN URL**
+                            window.location.href = `dashboard.html?uid=${user.uid}`;
+                        } else {
+                            // User is logged in but not active
+                            showAlert('Your account is not verified or active.', false);
+                            auth.signOut();
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Error checking admin status on load:", error);
+                        showAlert('Error checking admin status.', false);
+                        auth.signOut();
+                    });
+            } else {
+                // User is signed out. Do nothing, let them log in.
+            }
+        });
+
+        // Event listener for login form submission
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = loginForm.loginEmail.value;
+            const password = loginForm.loginPassword.value;
+
+            showLoadingBuffer();
+
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    // Check if the user exists in the database and their status is "Active"
+                    db.ref('admins/' + user.uid).once('value')
+                        .then((snapshot) => {
+                            hideLoadingBuffer();
+                            const adminData = snapshot.val();
+                            if (adminData && adminData.status === 'Active') {
+                                // **INSECURE REDIRECT WITH UID IN URL**
+                                window.location.href = `dashboard.html?uid=${user.uid}`;
+                            } else {
+                                showAlert('Your account is not verified or active.', false);
+                                auth.signOut(); // Sign out the user if not active
+                            }
+                        })
+                        .catch((error) => {
+                            hideLoadingBuffer();
+                            showAlert('Error checking admin status: ' + error.message, false);
+                        });
+                })
+                .catch((error) => {
+                    hideLoadingBuffer();
+                    let errorMessage = '';
+                    if (error.code === 'auth/user-not-found') {
+                        errorMessage = 'Admin not found. Please check your email.';
+                    } else if (error.code === 'auth/wrong-password') {
+                        errorMessage = 'Invalid password. Please try again.';
+                    } else {
+                        errorMessage = 'Login failed: ' + error.message;
+                    }
+                    showAlert(errorMessage, false);
+                });
+        });
+    </script>
+</body>
+</html>
