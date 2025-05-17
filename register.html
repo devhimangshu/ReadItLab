@@ -364,7 +364,7 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
-        const storage = firebase.storage();z
+        const storage = firebase.storage();
 
         // Get form elements
         const registerForm = document.getElementById('registerForm');
@@ -440,7 +440,7 @@
                                 status: 'Pending' // Initial status
                             }).then(() => {
                                 hideLoadingBuffer();
-                                showAlert('Registration successful! Your account needs to be verified by an administrator.');
+                                showAlert('Registration successful! Your account needs to beverified by an administrator.');
                                 registerForm.reset();
                                 window.location.href = 'index.html'; // Redirect to login
                             }).catch((error) => {
