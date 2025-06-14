@@ -1,396 +1,395 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Library Management System - Advanced Reports</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-   <style>
-    /* General styles (from members.html with slight modifications for reports) */
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        margin: 0;
-        padding: 0;
-        background: linear-gradient(to bottom, #121212, #333333); /* Dark background */
-        color: #ffffff;
-        line-height: 1.6;
-        position: relative;
-    }
-
-    header {
-        background-color: rgba(30, 30, 30, 0.85); /* Dark header background */
-        color: #ffffff;
-        padding: 1em 2em;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 2px solid #00ffff; /* Cyan border */
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-    }
-
-    header h1 {
-        margin: 0;
-        font-size: 1.8em;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-    }
-
-    nav ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        display: flex;
-    }
-
-    nav ul li {
-        margin-left: 1.5em;
-    }
-
-    nav ul li a {
-        color: #00ffff; /* Cyan color */
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        transition: color 0.3s ease;
-    }
-
-    nav ul li a:hover {
-        color: #ffffff;
-    }
-
-    nav ul li a i {
-        margin-right: 0.5em;
-    }
-
-    nav ul li a.active {
-        font-weight: bold;
-    }
-
-    nav ul li button {
-        background: none;
-        color: #00ffff; /* Cyan color */
-        border: none;
-        padding: 0;
-        font-size: inherit;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        transition: color 0.3s ease;
-    }
-
-    nav ul li button:hover {
-        color: #ffffff;
-    }
-
-    nav ul li button i {
-        margin-right: 0.5em;
-    }
-
-    main {
-        padding: 2em;
-    }
-
-    /* Report Specific Styles */
-    .report-section {
-        background-color: rgba(30, 30, 30, 0.85); /* Darker section background */
-        padding: 1.5em;
-        margin-bottom: 2em;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
-        position: relative;
-        border-left: 3px solid #00ffff; /* Cyan border */
-    }
-
-    .report-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1em;
-        border-bottom: 2px solid #00ffff; /* Cyan border */
-        padding-bottom: 0.5em;
-    }
-
-    .report-header h2 {
-        margin: 0;
-        color: #ffffff;
-        font-size: 1.4em;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-    }
-
-    .report-content {
-        padding-top: 0.8em;
-    }
-
-    .filter-options {
-        display: flex;
-        gap: 1em;
-        margin-bottom: 1em;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-
-    .filter-options label {
-        color: #cccccc;
-        margin-right: 0.5em;
-        font-weight: bold;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-    }
-
-    .filter-options select,
-    .filter-options input[type="date"],
-    .filter-options .flatpickr-wrapper {
-        padding: 0.5em;
-        background-color: rgba(255, 255, 255, 0.1); /* Slightly transparent input */
-        border: 2px solid #666666;
-        border-radius: 4px;
-        color: #ffffff;
-        appearance: none;
-        -webkit-appearance: none;
-        background-image: url('data:image/svg+xml;utf8,<svg fill="#ffffff" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
-        background-repeat: no-repeat;
-        background-position: right 0.5em top 50%;
-        background-size: 1.5em auto;
-    }
-
-    .filter-options select option,
-    .filter-options input[type="date"] option {
-        color: #ffffff;
-        background-color: #333333; /* Darker option background */
-    }
-
-    .filter-options select option:checked,
-    .filter-options input[type="date"] option:checked {
-        background-color: #007bff;
-        color: #ffffff;
-    }
-
-    .filter-options select option:hover,
-    .filter-options input[type="date"] option:hover {
-        background-color: #555555;
-        color: #ffffff;
-    }
-
-    .filter-options button {
-        padding: 0.7em 1em;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 1em;
-        transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
-        background: linear-gradient(to right, #007bff, #5dade2); /* Gradient button */
-        color: white;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    }
-
-    .filter-options button:hover {
-        background: linear-gradient(to right, #0056b3, #2e86c1); /* Darker gradient on hover */
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-    }
-
-    .report-table-container {
-        overflow-x: auto;
-        margin-bottom: 0.8em;
-    }
-
-    .report-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 0.8em;
-    }
-
-    .report-table th,
-    .report-table td {
-        padding: 0.6em;
-        border-bottom: 1px solid #666666;
-        text-align: left;
-        color: #cccccc;
-    }
-
-    .report-table th {
-        background-color: rgba(255, 255, 255, 0.1); /* Slightly transparent header */
-        font-weight: bold;
-        color: #ffffff;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-        position: sticky;
-        top: 0;
-        z-index: 1;
-    }
-
-    .report-table tr:hover {
-        background-color: rgba(255, 255, 255, 0.05); /* Slight hover effect */
-    }
-
-    #fines-report .report-table td.paid {
-        color: green;
-        font-weight: bold;
-    }
-
-    #fines-report .report-table td.unpaid {
-        color: red;
-        font-weight: bold;
-    }
-
-    .graphs-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 2em;
-        margin-top: 2em;
-        margin-bottom: 2em;
-    }
-
-    .graph-container {
-        background-color: rgba(30, 30, 30, 0.85); /* Darker container */
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
-        padding: 1.5em;
-        border-left: 3px solid #00ffff; /* Cyan border */
-    }
-
-    .graph-container h3 {
-        color: #ffffff;
-        margin-top: 0;
-        margin-bottom: 1em;
-        font-size: 1.2em;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-        border-bottom: 1px solid #00ffff; /* Cyan border */
-        padding-bottom: 0.5em;
-    }
-
-    #borrowingTrendsChart,
-    #userActivityChart,
-    #bookPopularityChart {
-        width: 100%;
-        height: 250px;
-    }
-
-    /* Loading Overlay Styles */
-    .loading-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5); /* Darker overlay */
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-    }
-
-    .loader {
-        border: 5px solid #f3f3f3;
-        border-top: 5px solid #00ffff; /* Cyan loader */
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        animation: spin 2s linear infinite;
-    }
-
-    @keyframes spin {
-        0% {
-            transform: rotate(0deg);
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+    <style>
+        /* General styles (from members.html with slight modifications for reports) */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #121212, #333333); /* Dark background */
+            color: #ffffff;
+            line-height: 1.6;
+            position: relative;
         }
 
-        100% {
-            transform: rotate(360deg);
+        header {
+            background-color: rgba(30, 30, 30, 0.85); /* Dark header background */
+            color: #ffffff;
+            padding: 1em 2em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #00ffff; /* Cyan border */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
         }
-    }
 
-    .hidden {
-        display: none !important;
-    }
+        header h1 {
+            margin: 0;
+            font-size: 1.8em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
 
-    /* Report Generation Options */
-    .report-generate-options {
-        background-color: rgba(30, 30, 30, 0.85); /* Darker options background */
-        padding: 1.5em;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
-        margin-bottom: 2em;
-        border-left: 3px solid #00ffff; /* Cyan border */
-    }
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+        }
 
-    .report-generate-options h2 {
-        color: #ffffff;
-        margin-top: 0;
-        margin-bottom: 1em;
-        font-size: 1.4em;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-        border-bottom: 2px solid #00ffff; /* Cyan border */
-        padding-bottom: 0.5em;
-    }
+        nav ul li {
+            margin-left: 1.5em;
+        }
 
-    .report-generate-options .option-group {
-        margin-bottom: 1em;
-        color: #cccccc;
-    }
+        nav ul li a {
+            color: #00ffff; /* Cyan color */
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: color 0.3s ease;
+        }
 
-    .report-generate-options label {
-        display: block;
-        margin-bottom: 0.3em;
-        font-weight: bold;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-    }
+        nav ul li a:hover {
+            color: #ffffff;
+        }
 
-    .report-generate-options input[type="date"],
-    .report-generate-options select {
-        width: calc(100% - 10px);
-        padding: 0.5em;
-        background-color: rgba(255, 255, 255, 0.1); /* Slightly transparent input */
-        border: 2px solid #666666;
-        border-radius: 4px;
-        color: #ffffff;
-        appearance: none;
-        -webkit-appearance: none;
-        background-image: url('data:image/svg+xml;utf8,<svg fill="#ffffff" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
-        background-repeat: no-repeat;
-        background-position: right 0.5em top 50%;
-        background-size: 1.5em auto;
-    }
+        nav ul li a i {
+            margin-right: 0.5em;
+        }
 
-    .report-generate-options select option {
-        color: #ffffff;
-        background-color: #333333; /* Darker option background */
-    }
+        nav ul li a.active {
+            font-weight: bold;
+        }
 
-    .report-generate-options select option:checked {
-        background-color: #007bff;
-        color: #ffffff;
-    }
+        nav ul li button {
+            background: none;
+            color: #00ffff; /* Cyan color */
+            border: none;
+            padding: 0;
+            font-size: inherit;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: color 0.3s ease;
+        }
 
-    .report-generate-options select option:hover {
-        background-color: #555555;
-        color: #ffffff;
-    }
+        nav ul li button:hover {
+            color: #ffffff;
+        }
 
-    .report-generate-options button {
-        padding: 0.7em 1em;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 1em;
-        transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
-        background: linear-gradient(to right, #007bff, #5dade2); /* Gradient button */
-        color: white;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    }
+        nav ul li button i {
+            margin-right: 0.5em;
+        }
 
-    .report-generate-options button:hover {
-        background: linear-gradient(to right, #0056b3, #2e86c1); /* Darker gradient on hover */
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-    }
-</style>
+        main {
+            padding: 2em;
+        }
+
+        /* Report Specific Styles */
+        .report-section {
+            background-color: rgba(30, 30, 30, 0.85); /* Darker section background */
+            padding: 1.5em;
+            margin-bottom: 2em;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+            position: relative;
+            border-left: 3px solid #00ffff; /* Cyan border */
+        }
+
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1em;
+            border-bottom: 2px solid #00ffff; /* Cyan border */
+            padding-bottom: 0.5em;
+        }
+
+        .report-header h2 {
+            margin: 0;
+            color: #ffffff;
+            font-size: 1.4em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        .report-content {
+            padding-top: 0.8em;
+        }
+
+        .filter-options {
+            display: flex;
+            gap: 1em;
+            margin-bottom: 1em;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-options label {
+            color: #cccccc;
+            margin-right: 0.5em;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .filter-options select,
+        .filter-options input[type="date"],
+        .filter-options .flatpickr-wrapper {
+            padding: 0.5em;
+            background-color: rgba(255, 255, 255, 0.1); /* Slightly transparent input */
+            border: 2px solid #666666;
+            border-radius: 4px;
+            color: #ffffff;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg fill="#ffffff" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 0.5em top 50%;
+            background-size: 1.5em auto;
+        }
+
+        .filter-options select option,
+        .filter-options input[type="date"] option {
+            color: #ffffff;
+            background-color: #333333; /* Darker option background */
+        }
+
+        .filter-options select option:checked,
+        .filter-options input[type="date"] option:checked {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+
+        .filter-options select option:hover,
+        .filter-options input[type="date"] option:hover {
+            background-color: #555555;
+            color: #ffffff;
+        }
+
+        .filter-options button {
+            padding: 0.7em 1em;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            background: linear-gradient(to right, #007bff, #5dade2); /* Gradient button */
+            color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .filter-options button:hover {
+            background: linear-gradient(to right, #0056b3, #2e86c1); /* Darker gradient on hover */
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .report-table-container {
+            overflow-x: auto;
+            margin-bottom: 0.8em;
+        }
+
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8em;
+        }
+
+        .report-table th,
+        .report-table td {
+            padding: 0.6em;
+            border-bottom: 1px solid #666666;
+            text-align: left;
+            color: #cccccc;
+        }
+
+        .report-table th {
+            background-color: rgba(255, 255, 255, 0.1); /* Slightly transparent header */
+            font-weight: bold;
+            color: #ffffff;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .report-table tr:hover {
+            background-color: rgba(255, 255, 255, 0.05); /* Slight hover effect */
+        }
+
+        #fines-report .report-table td.paid {
+            color: green;
+            font-weight: bold;
+        }
+
+        #fines-report .report-table td.unpaid {
+            color: red;
+            font-weight: bold;
+        }
+
+        .graphs-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2em;
+            margin-top: 2em;
+            margin-bottom: 2em;
+        }
+
+        .graph-container {
+            background-color: rgba(30, 30, 30, 0.85); /* Darker container */
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+            padding: 1.5em;
+            border-left: 3px solid #00ffff; /* Cyan border */
+        }
+
+        .graph-container h3 {
+            color: #ffffff;
+            margin-top: 0;
+            margin-bottom: 1em;
+            font-size: 1.2em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            border-bottom: 1px solid #00ffff; /* Cyan border */
+            padding-bottom: 0.5em;
+        }
+
+        #borrowingTrendsChart,
+        #userActivityChart,
+        #bookPopularityChart {
+            width: 100%;
+            height: 250px;
+        }
+
+        /* Loading Overlay Styles */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Darker overlay */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #00ffff; /* Cyan loader */
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Report Generation Options */
+        .report-generate-options {
+            background-color: rgba(30, 30, 30, 0.85); /* Darker options background */
+            padding: 1.5em;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+            margin-bottom: 2em;
+            border-left: 3px solid #00ffff; /* Cyan border */
+        }
+
+        .report-generate-options h2 {
+            color: #ffffff;
+            margin-top: 0;
+            margin-bottom: 1em;
+            font-size: 1.4em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            border-bottom: 2px solid #00ffff; /* Cyan border */
+            padding-bottom: 0.5em;
+        }
+
+        .report-generate-options .option-group {
+            margin-bottom: 1em;
+            color: #cccccc;
+        }
+
+        .report-generate-options label {
+            display: block;
+            margin-bottom: 0.3em;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .report-generate-options input[type="date"],
+        .report-generate-options select {
+            width: calc(100% - 10px);
+            padding: 0.5em;
+            background-color: rgba(255, 255, 255, 0.1); /* Slightly transparent input */
+            border: 2px solid #666666;
+            border-radius: 4px;
+            color: #ffffff;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg fill="#ffffff" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 0.5em top 50%;
+            background-size: 1.5em auto;
+        }
+
+        .report-generate-options select option {
+            color: #ffffff;
+            background-color: #333333; /* Darker option background */
+        }
+
+        .report-generate-options select option:checked {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+
+        .report-generate-options select option:hover {
+            background-color: #555555;
+            color: #ffffff;
+        }
+
+        .report-generate-options button {
+            padding: 0.7em 1em;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            background: linear-gradient(to right, #007bff, #5dade2); /* Gradient button */
+            color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .report-generate-options button:hover {
+            background: linear-gradient(to right, #0056b3, #2e86c1); /* Darker gradient on hover */
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -428,29 +427,28 @@
 
             <div class="option-group" id="dateRangeGroup" style="display: none;">
                 <label for="startDate">Start Date:</label>
-                <input type="date" id="startDate">
+                <input type="date" id="startDate" />
                 <label for="endDate">End Date:</label>
-                <input type="date" id="endDate">
+                <input type="date" id="endDate" />
             </div>
 
             <div class="option-group" id="bookSelectGroup" style="display: none;">
                 <label for="selectedBook">Select Book:</label>
                 <select id="selectedBook">
                     <option value="">Select a Book</option>
-                    </select>
+                </select>
             </div>
 
             <div class="option-group" id="userSelectGroup" style="display: none;">
                 <label for="selectedUser">Select User:</label>
                 <select id="selectedUser">
                     <option value="">Select a User</option>
-                    </select>
+                </select>
             </div>
 
             <button onclick="generateCustomReport()">Generate Report</button>
 
-            <div id="customReportOutput" class="report-content" style="margin-top: 1.5em;">
-                </div>
+            <div id="customReportOutput" class="report-content" style="margin-top: 1.5em;"></div>
         </section>
 
         <section id="graphs-section" class="report-section">
@@ -466,18 +464,18 @@
                             <label for="borrowingTrendsTimeframe">Timeframe:</label>
                             <select id="borrowingTrendsTimeframe">
                                 <option value="last7days">Last 7 Days</option>
-                                <option value="last30days">Last 30 Days</option>
+                                <option value="last30days" selected>Last 30 Days</option>
                                 <option value="thisMonth">This Month</option>
                                 <option value="lastMonth">Last Month</option>
                                 <option value="thisYear">This Year</option>
                                 <option value="allTime">All Time</option>
                                 <option value="custom">Custom Range</option>
                             </select>
-                            <div id="customBorrowingRange" style="display: none;">
+                            <div id="customBorrowingRange" style="display: none; gap: 0.5em; align-items: center;">
                                 <label for="borrowingStart">Start:</label>
-                                <input type="date" id="borrowingStart">
+                                <input type="date" id="borrowingStart" />
                                 <label for="borrowingEnd">End:</label>
-                                <input type="date" id="borrowingEnd">
+                                <input type="date" id="borrowingEnd" />
                                 <button onclick="updateBorrowingTrends('custom')">Apply</button>
                             </div>
                         </div>
@@ -490,18 +488,18 @@
                             <label for="userActivityTimeframe">Timeframe:</label>
                             <select id="userActivityTimeframe">
                                 <option value="last7days">Last 7 Days</option>
-                                <option value="last30days">Last 30 Days</option>
+                                <option value="last30days" selected>Last 30 Days</option>
                                 <option value="thisMonth">This Month</option>
                                 <option value="lastMonth">Last Month</option>
                                 <option value="thisYear">This Year</option>
                                 <option value="allTime">All Time</option>
                                 <option value="custom">Custom Range</option>
                             </select>
-                            <div id="customUserActivityRange" style="display: none;">
+                            <div id="customUserActivityRange" style="display: none; gap: 0.5em; align-items: center;">
                                 <label for="userActivityStart">Start:</label>
-                                <input type="date" id="userActivityStart">
+                                <input type="date" id="userActivityStart" />
                                 <label for="userActivityEnd">End:</label>
-                                <input type="date" id="userActivityEnd">
+                                <input type="date" id="userActivityEnd" />
                                 <button onclick="updateUserActivityChart('custom')">Apply</button>
                             </div>
                         </div>
@@ -513,13 +511,13 @@
                         <div class="filter-options">
                             <label for="popularityTimeframe">Timeframe:</label>
                             <select id="popularityTimeframe">
-                                <option value="last30days">Last 30 Days</option>
+                                <option value="last30days" selected>Last 30 Days</option>
                                 <option value="thisYear">This Year</option>
-                                <option value="allTime">All Time</option>
-                                </select>
+                                <option value="allTime">All Time</Timeframe>
+                            </select>
                             <label for="popularityLimit">Top:</label>
                             <select id="popularityLimit">
-                                <option value="5">5</option>
+                                <option value="5" selected>5</option>
                                 <option value="10">10</option>
                                 <option value="20">20</option>
                             </select>
@@ -552,8 +550,7 @@
                         </table>
                     </div>
                 </section>
-
-                </div>
+            </div>
         </section>
     </main>
 
@@ -562,768 +559,736 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script>
-    // Firebase Configuration (replace with your actual config)
-    const firebaseConfig = {
-        apiKey: "AIzaSyBPQ67r9mMz-x8fOCXozbVGMW_de81b0_8",
-        authDomain: "stakehub-fc6be.firebaseapp.com",
-        databaseURL: "https://stakehub-fc6be-default-rtdb.firebaseio.com",
-        projectId: "stakehub-fc6be",
-        storageBucket: "stakehub-fc6be.appspot.com",
-        messagingSenderId: "990758331124",
-        appId: "1:990758331124:android:11851d9fb54fa6d8eef4a1"
-    };
+    <script>
+        // Firebase Configuration (replace with your actual config)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBPQ67r9mMz-x8fOCXozbVGMW_de81b0_8",
+            authDomain: "stakehub-fc6be.firebaseapp.com",
+            databaseURL: "https://stakehub-fc6be-default-rtdb.firebaseio.com",
+            projectId: "stakehub-fc6be",
+            storageBucket: "stakehub-fc6be.appspot.com",
+            messagingSenderId: "990758331124",
+            appId: "1:990758331124:android:11851d9fb54fa6d8eef4a1"
+        };
 
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const dbRef = firebase.database().ref();
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const dbRef = firebase.database().ref();
 
-    // Get table bodies
-    const overdueBooksTableBody = document.getElementById('overdueBooksTable').querySelector('tbody');
-    // const finesTableBody = document.getElementById('finesTable').querySelector('tbody'); // Commented out
-    let allFinesData = []; // Commented out
+        // Get table bodies
+        const overdueBooksTableBody = document.getElementById('overdueBooksTable').querySelector('tbody');
 
-    // Get filter elements for fines
-    // const filterFinesButton = document.getElementById('filterFines'); // Commented out
-    // const fineStatusSelect = document.getElementById('fineStatus'); // Commented out
+        // Get graph elements
+        const borrowingTrendsChartCanvas = document.getElementById('borrowingTrendsChart');
+        const userActivityChartCanvas = document.getElementById('userActivityChart');
+        const bookPopularityChartCanvas = document.getElementById('bookPopularityChart');
+        let borrowingTrendsChart, userActivityChart, bookPopularityChart;
 
-    // Get graph elements
-    const borrowingTrendsChartCanvas = document.getElementById('borrowingTrendsChart');
-    const userActivityChartCanvas = document.getElementById('userActivityChart');
-    const bookPopularityChartCanvas = document.getElementById('bookPopularityChart');
-    let borrowingTrendsChart, userActivityChart, bookPopularityChart;
+        // Get filter elements for borrowing trends chart
+        const borrowingTrendsTimeframeSelect = document.getElementById('borrowingTrendsTimeframe');
+        const customBorrowingRangeDiv = document.getElementById('customBorrowingRange');
+        const borrowingStartInput = document.getElementById('borrowingStart');
+        const borrowingEndInput = document.getElementById('borrowingEnd');
 
-    // Get filter elements for borrowing trends chart
-    const borrowingTrendsTimeframeSelect = document.getElementById('borrowingTrendsTimeframe');
-    const customBorrowingRangeDiv = document.getElementById('customBorrowingRange');
-    const borrowingStartInput = document.getElementById('borrowingStart');
-    const borrowingEndInput = document.getElementById('borrowingEnd');
+        // Get filter elements for user activity chart
+        const userActivityTimeframeSelect = document.getElementById('userActivityTimeframe');
+        const customUserActivityRangeDiv = document.getElementById('customUserActivityRange');
+        const userActivityStartInput = document.getElementById('userActivityStart');
+        const userActivityEndInput = document.getElementById('userActivityEnd');
 
-    // Get filter elements for user activity chart
-    const userActivityTimeframeSelect = document.getElementById('userActivityTimeframe');
-    const customUserActivityRangeDiv = document.getElementById('customUserActivityRange');
-    const userActivityStartInput = document.getElementById('userActivityStart');
-    const userActivityEndInput = document.getElementById('userActivityEnd');
+        // Get filter elements for book popularity chart
+        const popularityTimeframeSelect = document.getElementById('popularityTimeframe');
+        const popularityLimitSelect = document.getElementById('popularityLimit');
 
-    // Get filter elements for book popularity chart
-    const popularityTimeframeSelect = document.getElementById('popularityTimeframe');
-    const popularityLimitSelect = document.getElementById('popularityLimit');
+        // Get loading overlay
+        const loadingOverlay = document.getElementById('loadingOverlay');
 
-    // Get loading overlay
-    const loadingOverlay = document.getElementById('loadingOverlay');
+        // Custom Report Generation Elements
+        const reportTypeSelect = document.getElementById('reportType');
+        const dateRangeGroup = document.getElementById('dateRangeGroup');
+        const bookSelectGroup = document.getElementById('bookSelectGroup');
+        const userSelectGroup = document.getElementById('userSelectGroup');
+        const selectedBookSelect = document.getElementById('selectedBook');
+        const selectedUserSelect = document.getElementById('selectedUser');
+        const customReportOutputDiv = document.getElementById('customReportOutput');
 
-    // Custom Report Generation Elements
-    const reportTypeSelect = document.getElementById('reportType');
-    const dateRangeGroup = document.getElementById('dateRangeGroup');
-    const bookSelectGroup = document.getElementById('bookSelectGroup');
-    const userSelectGroup = document.getElementById('userSelectGroup');
-    const selectedBookSelect = document.getElementById('selectedBook');
-    const selectedUserSelect = document.getElementById('selectedUser');
-    const customReportOutputDiv = document.getElementById('customReportOutput');
+        let allBooks = [];
+        let allMembers = [];
 
-    let allBooks = [];
-    let allMembers = [];
+        // Function to show loading overlay
+        const showLoading = () => {
+            loadingOverlay.classList.remove('hidden');
+        };
 
-    // Function to show loading overlay
-    const showLoading = () => {
-        loadingOverlay.classList.remove('hidden');
-    };
+        // Function to hide loading overlay
+        const hideLoading = () => {
+            loadingOverlay.classList.add('hidden');
+        };
 
-    // Function to hide loading overlay
-    const hideLoading = () => {
-        loadingOverlay.classList.add('hidden');
-    };
-
-    // Function to get data as an array from a Firebase snapshot
-    const snapshotToArray = (snapshot) => {
-        const dataArray = [];
-        snapshot.forEach(childSnapshot => {
-            const item = childSnapshot.val();
-            item.id = childSnapshot.key;
-            dataArray.push(item);
-        });
-        return dataArray;
-    };
-
-    firebase.auth().onAuthStateChanged(user => {
-        if (user) {
-            // Check if the user is an admin
-            dbRef.child('admins').child(user.uid).once('value', adminSnapshot => {
-                if (!adminSnapshot.exists()) {
-                    console.log("User is not an administrator.");
-                    window.location.href = 'index.html?unauthorized=true';
-                } else {
-                    loadOverdueBooks();
-                    // loadFines(); // Commented out
-                    loadBorrowingTrends('last30days');
-                    loadUserActivity('last30days');
-                    loadPopularBooks('last30days', 5); // Default to top 5
-                    loadAllBooksForSelect();
-                    loadAllMembersForSelect();
-                }
+        // Function to get data as an array from a Firebase snapshot
+        const snapshotToArray = (snapshot) => {
+            const dataArray = [];
+            snapshot.forEach(childSnapshot => {
+                const item = childSnapshot.val();
+                item.id = childSnapshot.key;
+                dataArray.push(item);
             });
-        } else {
-            // User is not signed in, redirect to login
-            window.location.href = 'index.html';
-        }
-    });
+            return dataArray;
+        };
 
-    function loadAllBooksForSelect() {
-        dbRef.child('books').once('value', snapshot => {
-            allBooks = snapshotToArray(snapshot);
-            selectedBookSelect.innerHTML = '<option value="">Select a Book</option>';
-            allBooks.forEach(book => {
-                const option = document.createElement('option');
-                option.value = book.id;
-                option.textContent = book.title;
-                selectedBookSelect.appendChild(option);
-            });
-        });
-    }
-
-    function loadAllMembersForSelect() {
-        dbRef.child('members').once('value', snapshot => {
-            allMembers = snapshotToArray(snapshot);
-            selectedUserSelect.innerHTML = '<option value="">Select a User</option>';
-            allMembers.forEach(member => {
-                const option = document.createElement('option');
-                option.value = member.id;
-                option.textContent = member.name;
-                selectedUserSelect.appendChild(option);
-            });
-        });
-    }
-
-    function loadOverdueBooks() {
-        showLoading();
-        overdueBooksTableBody.innerHTML = '';
-        const now = new Date();
-
-        dbRef.child('transactions').orderByChild('status').equalTo('checked_out').once('value', snapshot => {
-            const transactions = snapshotToArray(snapshot);
-            let overdueTransactions = [];
-
-            transactions.forEach(transaction => {
-                if (transaction.dueDate) {
-                    const dueDate = new Date(transaction.dueDate);
-                    if (dueDate < now) {
-                        overdueTransactions.push(transaction);
+        firebase.auth().onAuthStateChanged(user => {
+            if (user) {
+                // Check if the user is an admin
+                dbRef.child('admins').child(user.uid).once('value', adminSnapshot => {
+                    if (!adminSnapshot.exists()) {
+                        console.log("User is not an administrator.");
+                        window.location.href = 'index.html?unauthorized=true';
+                    } else {
+                        loadOverdueBooks();
+                        loadBorrowingTrends('last30days');
+                        loadUserActivity('last30days');
+                        loadPopularBooks('last30days', 5); // Default to top 5
+                        loadAllBooksForSelect();
+                        loadAllMembersForSelect();
                     }
-                }
-            });
-
-            if (overdueTransactions.length > 0) {
-                overdueTransactions.forEach(transaction => {
-                    Promise.all([
-                        dbRef.child('books').child(transaction.bookId).once('value'),
-                        dbRef.child('members').child(transaction.memberId).once('value')
-                    ]).then(([bookSnapshot, memberSnapshot]) => {
-                        if (bookSnapshot.exists() && memberSnapshot.exists()) {
-                            const book = bookSnapshot.val();
-                            const member = memberSnapshot.val();
-                            const dueDate = new Date(transaction.dueDate);
-                            const timeDiff = Math.abs(now.getTime() - dueDate.getTime());
-                            const daysOverdue = Math.ceil(timeDiff / (1000 * 3600 * 24));
-
-                            const row = overdueBooksTableBody.insertRow();
-                            row.insertCell().textContent = book.title || 'N/A';
-                            row.insertCell().textContent = member.name || 'N/A';
-                            row.insertCell().textContent = transaction.checkoutDate ? new Date(transaction.checkoutDate).toLocaleDateString() : 'N/A';
-                            row.insertCell().textContent = dueDate.toLocaleDateString();
-                            row.insertCell().textContent = daysOverdue;
-                        }
-                    });
                 });
             } else {
-                const row = overdueBooksTableBody.insertRow();
-                const cell = row.insertCell();
-                cell.colSpan = 5;
-                cell.textContent = 'No overdue books at this time.';
+                // User is not signed in, redirect to login
+                window.location.href = 'index.html';
             }
-        }).finally(hideLoading);
-    }
+        });
 
-    // function loadFines() { // Commented out
-    //     showLoading();
-    //     finesTableBody.innerHTML = '';
-    //     dbRef.child('fines').once('value', snapshot => {
-    //         allFinesData = snapshotToArray(snapshot);
-    //         displayFines(allFinesData);
-    //     }).finally(hideLoading);
-    // }
+        function loadAllBooksForSelect() {
+            dbRef.child('books').once('value', snapshot => {
+                allBooks = snapshotToArray(snapshot);
+                selectedBookSelect.innerHTML = '<option value="">Select a Book</option>';
+                allBooks.forEach(book => {
+                    const option = document.createElement('option');
+                    option.value = book.id;
+                    option.textContent = book.title;
+                    selectedBookSelect.appendChild(option);
+                });
+            });
+        }
 
-    // function displayFines(fines) { // Commented out
-    //     finesTableBody.innerHTML = '';
-    //     if (fines.length > 0) {
-    //         fines.forEach(fine => {
-    //             Promise.all([
-    //                 dbRef.child('members').child(fine.memberId).once('value'),
-    //                 dbRef.child('books').child(fine.bookId).once('value')
-    //             ]).then(([memberSnapshot, bookSnapshot]) => {
-    //                 if (memberSnapshot.exists() && bookSnapshot.exists()) {
-    //                     const member = memberSnapshot.val();
-    //                     const book = bookSnapshot.val();
-    //                     const row = finesTableBody.insertRow();
-    //                     row.insertCell().textContent = member.name || 'N/A';
-    //                     row.insertCell().textContent = book.title || 'N/A';
-    //                     row.insertCell().textContent = fine.dueDate ? new Date(fine.dueDate).toLocaleDateString() : 'N/A';
-    //                     row.insertCell().textContent = fine.returnDate ? new Date(fine.returnDate).toLocaleDateString() : 'N/A';
-    //                     row.insertCell().textContent = fine.daysOverdue || 'N/A';
-    //                     row.insertCell().textContent = fine.amount ? parseFloat(fine.amount).toFixed(2) : 'N/A';
-    //                     const statusCell = row.insertCell();
-    //                     statusCell.textContent = fine.paid ? 'Paid' : 'Unpaid';
-    //                     statusCell.classList.add(fine.paid ? 'paid' : 'unpaid');
-    //                 }
-    //             });
-    //         });
-    //     } else {
-    //         const row = finesTableBody.insertRow();
-    //         const cell = row.insertCell();
-    //         cell.colSpan = 7;
-    //         cell.textContent = 'No fines recorded.';
-    //     }
-    // }
+        function loadAllMembersForSelect() {
+            dbRef.child('members').once('value', snapshot => {
+                allMembers = snapshotToArray(snapshot);
+                selectedUserSelect.innerHTML = '<option value="">Select a User</option>';
+                allMembers.forEach(member => {
+                    const option = document.createElement('option');
+                    option.value = member.id;
+                    option.textContent = member.name;
+                    selectedUserSelect.appendChild(option);
+                });
+            });
+        }
 
-    // filterFinesButton.addEventListener('click', () => { // Commented out
-    //     const selectedStatus = fineStatusSelect.value;
-    //     const filteredFines = selectedStatus ? allFinesData.filter(fine => (selectedStatus === 'paid' && fine.paid) || (selectedStatus === 'unpaid' && !fine.paid)) : allFinesData;
-    //     displayFines(filteredFines);
-    // });
-
-    function loadBorrowingTrends(timeframe, startDate = null, endDate = null) {
-        showLoading();
-        dbRef.child('transactions').orderByChild('checkoutDate').once('value', snapshot => {
-            const transactions = snapshotToArray(snapshot);
-            const bookCheckoutCounts = {};
+        function loadOverdueBooks() {
+            showLoading();
+            overdueBooksTableBody.innerHTML = '';
             const now = new Date();
-            let filteredTransactions = transactions;
 
-            if (timeframe === 'last7days') {
-                const pastDate = new Date(now);
-                pastDate.setDate(now.getDate() - 7);
-                filteredTransactions = transactions.filter(t => t.checkoutDate && new Date(t.checkoutDate) >= pastDate);
-            } else if (timeframe === 'last30days') {
-                const pastDate = new Date(now);
-                pastDate.setDate(now.getDate() - 30);
-                filteredTransactions = transactions.filter(t => t.checkoutDate && new Date(t.checkoutDate) >= pastDate);
-            } else if (timeframe === 'thisMonth') {
-                filteredTransactions = transactions.filter(t => t.checkoutDate && new Date(t.checkoutDate).getMonth() === now.getMonth() && new Date(t.checkoutDate).getFullYear() === now.getFullYear());
-            } else if (timeframe === 'lastMonth') {
-                const lastMonth = now.getMonth() === 0 ? 11 : now.getMonth() - 1;
-                const year = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
-                filteredTransactions = transactions.filter(t => t.checkoutDate && new Date(t.checkoutDate).getMonth() === lastMonth && new Date(t.checkoutDate).getFullYear() === year);
-            } else if (timeframe === 'thisYear') {
-                filteredTransactions = transactions.filter(t => t.checkoutDate && new Date(t.checkoutDate).getFullYear() === now.getFullYear());
-            } else if (timeframe === 'allTime') {
-                // Keep all transactions
-            } else if (timeframe === 'custom' && startDate && endDate) {
-                const start = new Date(startDate);
-                const end = new Date(endDate);
-                filteredTransactions = transactions.filter(t => t.checkoutDate && new Date(t.checkoutDate) >= start && new Date(t.checkoutDate) <= end);
-            }
+            dbRef.child('transactions').orderByChild('status').equalTo('checked_out').once('value', snapshot => {
+                const transactions = snapshotToArray(snapshot);
+                let overdueTransactions = [];
 
-            filteredTransactions.forEach(transaction => {
-                bookCheckoutCounts[transaction.bookId] = (bookCheckoutCounts[transaction.bookId] || 0) + 1;
-            });
-
-            const sortedTrends = Object.entries(bookCheckoutCounts).sort(([, countA], [, countB]) => countB - countA).slice(0, 5); // Show top 5
-            const labels = [];
-            const data = [];
-
-            Promise.all(sortedTrends.map(([bookId]) => dbRef.child('books').child(bookId).once('value')))
-                .then(snapshots => {
-                    snapshots.forEach(snapshot => {
-                        if (snapshot.exists()) {
-                            labels.push(snapshot.val().title || 'N/A');
-                            const bookId = snapshot.key;
-                            data.push(bookCheckoutCounts[bookId] || 0);
+                transactions.forEach(transaction => {
+                    if (transaction.dueDate) {
+                        const dueDate = new Date(transaction.dueDate);
+                        if (dueDate < now) {
+                            overdueTransactions.push(transaction);
                         }
-                    });
-                    renderBorrowingTrendsChart(labels, data);
-                })
-                .finally(hideLoading);
-        });
-    }
-
-    function renderBorrowingTrendsChart(labels, data) {
-        if (borrowingTrendsChart) {
-            borrowingTrendsChart.destroy();
-        }
-        borrowingTrendsChart = new Chart(borrowingTrendsChartCanvas, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Checkouts',
-                    data: data,
-                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Count',
-                            font: { size: 10 }
-                        },
-                        ticks: { fontSize: 8 }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Book',
-                            font: { size: 10 }
-                        },
-                        ticks: { fontSize: 8 }
                     }
-                },
-                plugins: {
-                    legend: { display: false },
-                    title: { display: true, text: 'Borrowing Trends', font: { size: 12 } }
-                }
-            }
-        });
-    }
+                });
 
-    borrowingTrendsTimeframeSelect.addEventListener('change', function() {
-        const timeframe = this.value;
-        if (timeframe === 'custom') {
-            customBorrowingRangeDiv.style.display = 'flex';
-        } else {
-            customBorrowingRangeDiv.style.display = 'none';
-            loadBorrowingTrends(timeframe);
-        }
-    });
+                if (overdueTransactions.length > 0) {
+                    let promises = overdueTransactions.map(transaction => {
+                        return Promise.all([
+                            dbRef.child('books').child(transaction.bookId).once('value'),
+                            dbRef.child('members').child(transaction.memberId).once('value')
+                        ]).then(([bookSnapshot, memberSnapshot]) => {
+                            if (bookSnapshot.exists() && memberSnapshot.exists()) {
+                                const book = bookSnapshot.val();
+                                const member = memberSnapshot.val();
+                                const dueDate = new Date(transaction.dueDate);
+                                const timeDiff = Math.abs(now.getTime() - dueDate.getTime());
+                                const daysOverdue = Math.ceil(timeDiff / (1000 * 3600 * 24));
 
-    function updateBorrowingTrends(type) {
-        let start = null;
-        let end = null;
-        if (type === 'custom') {
-            start = borrowingStartInput.value;
-            end = borrowingEndInput.value;
-            if (!start || !end) {
-                alert('Please select both start and end dates for custom range.');
-                return;
-            }
-        }
-        loadBorrowingTrends(borrowingTrendsTimeframeSelect.value, start, end);
-    }
-
-    function loadUserActivity(timeframe, startDate = null, endDate = null) {
-        showLoading();
-        const checkouts = {};
-        const returns = {};
-        const now = new Date();
-
-        dbRef.child('transactions').orderByChild('transactionDate').once('value', snapshot => {
-            const transactions = snapshotToArray(snapshot);
-            let filteredTransactions = transactions;
-
-            if (timeframe === 'last7days') {
-                const pastDate = new Date(now);
-                pastDate.setDate(now.getDate() - 7);
-                filteredTransactions = transactions.filter(t => t.transactionDate && new Date(t.transactionDate) >= pastDate);
-            } else if (timeframe === 'last30days') {
-                const pastDate = new Date(now);
-                pastDate.setDate(now.getDate() - 30);
-                filteredTransactions = transactions.filter(t => t.transactionDate && new Date(t.transactionDate) >= pastDate);
-            } else if (timeframe === 'thisMonth') {
-                filteredTransactions = transactions.filter(t => t.transactionDate && new Date(t.transactionDate).getMonth() === now.getMonth() && new Date(t.transactionDate).getFullYear() === now.getFullYear());
-            } else if (timeframe === 'lastMonth') {
-                const lastMonth = now.getMonth() === 0 ? 11 : now.getMonth() - 1;
-                const year = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
-                filteredTransactions = transactions.filter(t => t.transactionDate && new Date(t.transactionDate).getMonth() === lastMonth && new Date(t.transactionDate).getFullYear() === year);
-            } else if (timeframe === 'thisYear') {
-                filteredTransactions = transactions.filter(t => t.transactionDate && new Date(t.transactionDate).getFullYear() === now.getFullYear());
-            } else if (timeframe === 'allTime') {
-                // Keep all transactions
-            } else if (timeframe === 'custom' && startDate && endDate) {
-                const start = new Date(startDate);
-                const end = new Date(endDate);
-                filteredTransactions = transactions.filter(t => t.transactionDate && new Date(t.transactionDate) >= start && new Date(t.transactionDate) <= end);
-            }
-
-            filteredTransactions.forEach(transaction => {
-                const userId = transaction.memberId;
-                if (transaction.type === 'checkout') {
-                    checkouts[userId] = (checkouts[userId] || 0) + 1;
-                } else if (transaction.type === 'return') {
-                    returns[userId] = (returns[userId] || 0) + 1;
-                }
-            });
-
-            const userLabels = [];
-            const checkoutData = [];
-            const returnData = [];
-
-            const allUserIds = [...new Set([...Object.keys(checkouts), ...Object.keys(returns)])];
-            const topUsers = allUserIds.slice(0, 5); // Display top 5 users
-
-            Promise.all(topUsers.map(userId => dbRef.child('members').child(userId).once('value')))
-                .then(snapshots => {
-                    snapshots.forEach(snapshot => {
-                        if (snapshot.exists()) {
-                            const member = snapshot.val();
-                            const userId = snapshot.key;
-                            userLabels.push(member.name || 'User ID: ' + userId);
-                            checkoutData.push(checkouts[userId] || 0);
-                            returnData.push(returns[userId] || 0);
-                        }
+                                const row = overdueBooksTableBody.insertRow();
+                                row.insertCell().textContent = book.title || 'N/A';
+                                row.insertCell().textContent = member.name || 'N/A';
+                                row.insertCell().textContent = transaction.checkoutDate ? new Date(transaction.checkoutDate).toLocaleDateString() : 'N/A';
+                                row.insertCell().textContent = dueDate.toLocaleDateString();
+                                row.insertCell().textContent = daysOverdue;
+                            }
+                        });
                     });
-                    renderUserActivityChart(userLabels, checkoutData, returnData);
-                })
-                .finally(hideLoading);
-        });
-    }
-
-    function renderUserActivityChart(labels, checkoutData, returnData) {
-        if (userActivityChart) {
-            userActivityChart.destroy();
-        }
-        userActivityChart = new Chart(userActivityChartCanvas, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Checkouts',
-                    data: checkoutData,
-                    backgroundColor: 'rgba(255, 99, 132, 0.7)',
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    borderWidth: 1
-                }, {
-                    label: 'Returns',
-                    data: returnData,
-                    backgroundColor: 'rgba(75, 192, 192, 0.7)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Count',
-                            font: { size: 10 }
-                        },
-                        ticks: { fontSize: 8 }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'User',
-                            font: { size: 10 }
-                        },
-                        ticks: { fontSize: 8 }
-                    }
-                },
-                plugins: {
-                    title: { display: true, text: 'User Activity', font: { size: 12 } }
-                }
-            }
-        });
-    }
-
-    userActivityTimeframeSelect.addEventListener('change', function() {
-        const timeframe = this.value;
-        if (timeframe === 'custom') {
-            customUserActivityRangeDiv.style.display = 'flex';
-        } else {
-            customUserActivityRangeDiv.style.display = 'none';
-            loadUserActivity(timeframe);
-        }
-    });
-
-    function updateUserActivityChart(type) {
-        let start = null;
-        let end = null;
-        if (type === 'custom') {
-            start = userActivityStartInput.value;
-            end = userActivityEndInput.value;
-            if (!start || !end) {
-                alert('Please select both start and end dates for custom range.');
-                return;
-            }
-        }
-        loadUserActivity(userActivityTimeframeSelect.value, start, end);
-    }
-
-    function loadPopularBooks(timeframe, limit) {
-        showLoading();
-        dbRef.child('transactions').orderByChild('checkoutDate').once('value', snapshot => {
-            const transactions = snapshotToArray(snapshot);
-            const bookCheckoutCounts = {};
-            const now = new Date();
-            let filteredTransactions = transactions;
-
-            if (timeframe === 'last30days') {
-                const pastDate = new Date(now);
-                pastDate.setDate(now.getDate() - 30);
-                filteredTransactions = transactions.filter(t => t.checkoutDate && new Date(t.checkoutDate) >= pastDate);
-            } else if (timeframe === 'thisYear') {
-                filteredTransactions = transactions.filter(t => t.checkoutDate && new Date(t.checkoutDate).getFullYear() === now.getFullYear());
-            } else if (timeframe === 'allTime') {
-                // Keep all transactions
-            }
-
-            filteredTransactions.forEach(transaction => {
-                bookCheckoutCounts[transaction.bookId] = (bookCheckoutCounts[transaction.bookId] || 0) + 1;
-            });
-
-            const sortedTrends = Object.entries(bookCheckoutCounts).sort(([, countA], [, countB]) => countB - countA).slice(0, limit);
-            const labels = [];
-            const data = [];
-
-            Promise.all(sortedTrends.map(([bookId]) => dbRef.child('books').child(bookId).once('value')))
-                .then(snapshots => {
-                    snapshots.forEach(snapshot => {
-                        if (snapshot.exists()) {
-                            labels.push(snapshot.val().title || 'N/A');
-                            data.push(bookCheckoutCounts[snapshot.key] || 0);
-                        }
-                    });
-                    renderBookPopularityChart(labels, data);
-                })
-                .finally(hideLoading);
-        });
-    }
-
-    function renderBookPopularityChart(labels, data) {
-        if (bookPopularityChart) {
-            bookPopularityChart.destroy();
-        }
-        bookPopularityChart = new Chart(bookPopularityChartCanvas, {
-            type: 'doughnut',
-            data: {
-                labels: labels,
-                datasets: [{
-                    data: data,
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.7)',
-                        'rgba(54, 162, 235, 0.7)',
-                        'rgba(255, 206, 86, 0.7)',
-                        'rgba(75, 192, 192, 0.7)',
-                        'rgba(153, 102, 255, 0.7)',
-                        'rgba(255, 159, 64, 0.7)',
-                        'rgba(120, 200, 100, 0.7)',
-                        'rgba(200, 150, 255, 0.7)',
-                        'rgba(255, 100, 200, 0.7)',
-                        'rgba(100, 200, 255, 0.7)'
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)',
-                        'rgba(120, 200, 100, 1)',
-                        'rgba(200, 150, 255, 1)',
-                        'rgba(255, 100, 200, 1)',
-                        'rgba(100, 200, 255, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                plugins: {
-                    title: { display: true, text: `Top ${popularityLimitSelect.value} Books`, font: { size: 12 } },
-                    legend: { position: 'bottom', labels: { usePointStyle: true, fontSize: 8 } }
-                }
-            }
-        });
-    }
-
-    popularityTimeframeSelect.addEventListener('change', updateBookPopularity);
-    popularityLimitSelect.addEventListener('change', updateBookPopularity);
-
-    function updateBookPopularity() {
-        loadPopularBooks(popularityTimeframeSelect.value, parseInt(popularityLimitSelect.value));
-    }
-
-    reportTypeSelect.addEventListener('change', function() {
-        const reportType = this.value;
-        dateRangeGroup.style.display = reportType === 'book_borrowing' || reportType === 'user_borrowing' || reportType === 'transaction_log' || reportType === 'new_members' || reportType === 'new_books' ? 'flex' : 'none';
-        bookSelectGroup.style.display = reportType === 'book_borrowing' ? 'block' : 'none';
-        userSelectGroup.style.display = reportType === 'user_borrowing' ? 'block' : 'none';
-        customReportOutputDiv.innerHTML = ''; // Clear previous report
-    });
-
-    async function generateCustomReport() {
-        const reportType = reportTypeSelect.value;
-        const startDate = document.getElementById('startDate').value;
-        const endDate = document.getElementById('endDate').value;
-        let reportData = [];
-        customReportOutputDiv.innerHTML = '<p style="font-size: 0.9em;">Generating report...</p>';
-        showLoading();
-
-        try {
-            if (reportType === 'book_borrowing') {
-                const bookId = selectedBookSelect.value;
-                if (!bookId) {
-                    alert('Please select a book.');
+                    Promise.all(promises).finally(hideLoading);
+                } else {
+                    const row = overdueBooksTableBody.insertRow();
+                    const cell = row.insertCell();
+                    cell.colSpan = 5;
+                    cell.textContent = 'No overdue books at this time.';
                     hideLoading();
+                }
+            }).catch(() => {
+                hideLoading();
+            });
+        }
+
+        function loadBorrowingTrends(timeframe, startDate = null, endDate = null) {
+            showLoading();
+            dbRef.child('transactions').orderByChild('checkoutDate').once('value', snapshot => {
+                const transactions = snapshotToArray(snapshot);
+                const bookCheckoutCounts = {};
+                const now = new Date();
+                let filteredTransactions = transactions;
+
+                if (timeframe === 'last7days') {
+                    const pastDate = new Date(now);
+                    pastDate.setDate(now.getDate() - 7);
+                    filteredTransactions = transactions.filter(t => t.checkoutDate && new Date(t.checkoutDate) >= pastDate);
+                } else if (timeframe === 'last30days') {
+                    const pastDate = new Date(now);
+                    pastDate.setDate(now.getDate() - 30);
+                    filteredTransactions = transactions.filter(t => t.checkoutDate && new Date(t.checkoutDate) >= pastDate);
+                } else if (timeframe === 'thisMonth') {
+                    filteredTransactions = transactions.filter(t => t.checkoutDate && new Date(t.checkoutDate).getMonth() === now.getMonth() && new Date(t.checkoutDate).getFullYear() === now.getFullYear());
+                } else if (timeframe === 'lastMonth') {
+                    const lastMonth = now.getMonth() === 0 ? 11 : now.getMonth() - 1;
+                    const year = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
+                    filteredTransactions = transactions.filter(t => t.checkoutDate && new Date(t.checkoutDate).getMonth() === lastMonth && new Date(t.checkoutDate).getFullYear() === year);
+                } else if (timeframe === 'thisYear') {
+                    filteredTransactions = transactions.filter(t => t.checkoutDate && new Date(t.checkoutDate).getFullYear() === now.getFullYear());
+                } else if (timeframe === 'allTime') {
+                    // Keep all transactions
+                } else if (timeframe === 'custom' && startDate && endDate) {
+                    const start = new Date(startDate);
+                    const end = new Date(endDate);
+                    filteredTransactions = transactions.filter(t => t.checkoutDate && new Date(t.checkoutDate) >= start && new Date(t.checkoutDate) <= end);
+                }
+
+                filteredTransactions.forEach(transaction => {
+                    bookCheckoutCounts[transaction.bookId] = (bookCheckoutCounts[transaction.bookId] || 0) + 1;
+                });
+
+                const sortedTrends = Object.entries(bookCheckoutCounts).sort(([, countA], [, countB]) => countB - countA).slice(0, 5); // Show top 5
+                const labels = [];
+                const data = [];
+
+                Promise.all(sortedTrends.map(([bookId]) => dbRef.child('books').child(bookId).once('value')))
+                    .then(snapshots => {
+                        snapshots.forEach(snapshot => {
+                            if (snapshot.exists()) {
+                                labels.push(snapshot.val().title || 'N/A');
+                                data.push(bookCheckoutCounts[snapshot.key] || 0);
+                            }
+                        });
+                        renderBorrowingTrendsChart(labels, data);
+                    })
+                    .finally(hideLoading);
+            }).catch(() => {
+                hideLoading();
+            });
+        }
+
+        function renderBorrowingTrendsChart(labels, data) {
+            if (borrowingTrendsChart) {
+                borrowingTrendsChart.destroy();
+            }
+            borrowingTrendsChart = new Chart(borrowingTrendsChartCanvas, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Checkouts',
+                        data: data,
+                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Count',
+                                font: { size: 10 }
+                            },
+                            ticks: { fontSize: 8 }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Book',
+                                font: { size: 10 }
+                            },
+                            ticks: { fontSize: 8 }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: true, text: 'Borrowing Trends', font: { size: 12 } }
+                    }
+                }
+            });
+        }
+
+        borrowingTrendsTimeframeSelect.addEventListener('change', function () {
+            const timeframe = this.value;
+            if (timeframe === 'custom') {
+                customBorrowingRangeDiv.style.display = 'flex';
+            } else {
+                customBorrowingRangeDiv.style.display = 'none';
+                loadBorrowingTrends(timeframe);
+            }
+        });
+
+        function updateBorrowingTrends(type) {
+            let start = null;
+            let end = null;
+            if (type === 'custom') {
+                start = borrowingStartInput.value;
+                end = borrowingEndInput.value;
+                if (!start || !end) {
+                    alert('Please select both start and end dates for custom range.');
                     return;
                 }
-                const bookSnapshot = await dbRef.child('books').child(bookId).once('value');
-                const transactionsSnapshot = await dbRef.child('transactions').orderByChild('bookId').equalTo(bookId).once('value');
-                const transactions = snapshotToArray(transactionsSnapshot).filter(t => (!startDate || (t.checkoutDate && new Date(t.checkoutDate) >= new Date(startDate))) && (!endDate || (t.checkoutDate && new Date(t.checkoutDate) <= new Date(endDate))));
-                reportData.push(`<h3 style="font-size: 1em; margin-bottom: 0.5em;">Borrowing History: "${bookSnapshot.val()?.title || 'N/A'}"</h3>`);
-                if (transactions.length > 0) {
-                    let tableHTML = '<table class="report-table"><thead><tr><th>Member</th><th>Checkout Date</th><th>Due Date</th><th>Return Date</th><th>Status</th></tr></thead><tbody>';
-                    for (const transaction of transactions) {
-                        const memberSnapshot = await dbRef.child('members').child(transaction.memberId).once('value');
-                        const member = memberSnapshot.val();
-                        tableHTML += `<tr><td><span class="math-inline">\{member?\.name \|\| 'N/A'\}</td\><td\></span>{transaction.checkoutDate ? new Date(transaction.checkoutDate).toLocaleDateString() : 'N/A'}</td><td><span class="math-inline">\{transaction\.dueDate ? new Date\(transaction\.dueDate\)\.toLocaleDateString\(\) \: 'N/A'\}</td\><td\></span>{transaction.returnDate ? new Date(transaction.returnDate).toLocaleDateString() : 'N/A'}</td><td>${transaction.status || 'N/A'}</td></tr>`;
-                    }
-                    tableHTML += '</tbody></table>';
-                    reportData.push(tableHTML);
-                } else {
-                    reportData.push('<p style="font-size: 0.9em;">No borrowing history found for this book within the selected date range.</p>');
+            }
+            loadBorrowingTrends(borrowingTrendsTimeframeSelect.value, start, end);
+        }
+
+        function loadUserActivity(timeframe, startDate = null, endDate = null) {
+            showLoading();
+            const checkouts = {};
+            const returns = {};
+            const now = new Date();
+
+            dbRef.child('transactions').orderByChild('transactionDate').once('value', snapshot => {
+                const transactions = snapshotToArray(snapshot);
+                let filteredTransactions = transactions;
+
+                if (timeframe === 'last7days') {
+                    const pastDate = new Date(now);
+                    pastDate.setDate(now.getDate() - 7);
+                    filteredTransactions = transactions.filter(t => t.transactionDate && new Date(t.transactionDate) >= pastDate);
+                } else if (timeframe === 'last30days') {
+                    const pastDate = new Date(now);
+                    pastDate.setDate(now.getDate() - 30);
+                    filteredTransactions = transactions.filter(t => t.transactionDate && new Date(t.transactionDate) >= pastDate);
+                } else if (timeframe === 'thisMonth') {
+                    filteredTransactions = transactions.filter(t => t.transactionDate && new Date(t.transactionDate).getMonth() === now.getMonth() && new Date(t.transactionDate).getFullYear() === now.getFullYear());
+                } else if (timeframe === 'lastMonth') {
+                    const lastMonth = now.getMonth() === 0 ? 11 : now.getMonth() - 1;
+                    const year = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
+                    filteredTransactions = transactions.filter(t => t.transactionDate && new Date(t.transactionDate).getMonth() === lastMonth && new Date(t.transactionDate).getFullYear() === year);
+                } else if (timeframe === 'thisYear') {
+                    filteredTransactions = transactions.filter(t => t.transactionDate && new Date(t.transactionDate).getFullYear() === now.getFullYear());
+                } else if (timeframe === 'allTime') {
+                    // Keep all transactions
+                } else if (timeframe === 'custom' && startDate && endDate) {
+                    const start = new Date(startDate);
+                    const end = new Date(endDate);
+                    filteredTransactions = transactions.filter(t => t.transactionDate && new Date(t.transactionDate) >= start && new Date(t.transactionDate) <= end);
                 }
-            } else if (reportType === 'user_borrowing') {
-                const userId = selectedUserSelect.value;
-                if (!userId) {
-                    alert('Please select a user.');
-                    hideLoading();
+
+                filteredTransactions.forEach(transaction => {
+                    const userId = transaction.memberId;
+                    if (transaction.type === 'checkout') {
+                        checkouts[userId] = (checkouts[userId] || 0) + 1;
+                    } else if (transaction.type === 'return') {
+                        returns[userId] = (returns[userId] || 0) + 1;
+                    }
+                });
+
+                const userLabels = [];
+                const checkoutData = [];
+                const returnData = [];
+
+                // Sort users by total activity count descending
+                const allUserIds = [...new Set([...Object.keys(checkouts), ...Object.keys(returns)])];
+                allUserIds.sort((a, b) => ((checkouts[b] || 0) + (returns[b] || 0)) - ((checkouts[a] || 0) + (returns[a] || 0)));
+                const topUsers = allUserIds.slice(0, 5); // Display top 5 users
+
+                Promise.all(topUsers.map(userId => dbRef.child('members').child(userId).once('value')))
+                    .then(snapshots => {
+                        snapshots.forEach(snapshot => {
+                            if (snapshot.exists()) {
+                                const member = snapshot.val();
+                                userLabels.push(member.name || 'User ID: ' + snapshot.key);
+                                checkoutData.push(checkouts[snapshot.key] || 0);
+                                returnData.push(returns[snapshot.key] || 0);
+                            }
+                        });
+                        renderUserActivityChart(userLabels, checkoutData, returnData);
+                    })
+                    .finally(hideLoading);
+            }).catch(() => {
+                hideLoading();
+            });
+        }
+
+        function renderUserActivityChart(labels, checkoutData, returnData) {
+            if (userActivityChart) {
+                userActivityChart.destroy();
+            }
+            userActivityChart = new Chart(userActivityChartCanvas, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Checkouts',
+                        data: checkoutData,
+                        backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: 'Returns',
+                        data: returnData,
+                        backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Count',
+                                font: { size: 10 }
+                            },
+                            ticks: { fontSize: 8 }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'User',
+                                font: { size: 10 }
+                            },
+                            ticks: { fontSize: 8 }
+                        }
+                    },
+                    plugins: {
+                        title: { display: true, text: 'User Activity', font: { size: 12 } }
+                    }
+                }
+            });
+        }
+
+        userActivityTimeframeSelect.addEventListener('change', function () {
+            const timeframe = this.value;
+            if (timeframe === 'custom') {
+                customUserActivityRangeDiv.style.display = 'flex';
+            } else {
+                customUserActivityRangeDiv.style.display = 'none';
+                loadUserActivity(timeframe);
+            }
+        });
+
+        function updateUserActivityChart(type) {
+            let start = null;
+            let end = null;
+            if (type === 'custom') {
+                start = userActivityStartInput.value;
+                end = userActivityEndInput.value;
+                if (!start || !end) {
+                    alert('Please select both start and end dates for custom range.');
                     return;
                 }
-                const memberSnapshot = await dbRef.child('members').child(userId).once('value');
-                const member = memberSnapshot.val();
-                const transactionsSnapshot = await dbRef.child('transactions').orderByChild('memberId').equalTo(userId).once('value');
-                const transactions = snapshotToArray(transactionsSnapshot).filter(t => (!startDate || (t.checkoutDate && new Date(t.checkoutDate) >= new Date(startDate))) && (!endDate || (t.checkoutDate && new Date(t.checkoutDate) <= new Date(endDate))));
-                reportData.push(`<h3 style="font-size: 1em; margin-bottom: 0.5em;">Borrowing History: "${member?.name || 'N/A'}"</h3>`);
-                if (transactions.length > 0) {
-                    let tableHTML = '<table class="report-table"><thead><tr><th>Book</th><th>Checkout Date</th><th>Due Date</th><th>Return Date</th><th>Status</th></tr></thead><tbody>';
-                    for (const transaction of transactions) {
-                        const bookSnapshot = await dbRef.child('books').child(transaction.bookId).once('value');
-                        const book = bookSnapshot.val();
-                        tableHTML += `<tr><td><span class="math-inline">\{book?\.title \|\| 'N/A'\}</td\><td\></span>{transaction.checkoutDate ? new Date(transaction.checkoutDate).toLocaleDateString() : 'N/A'}</td><td><span class="math-inline">\{transaction\.dueDate ? new Date\(transaction\.dueDate\)\.toLocaleDateString\(\) \: 'N/A'\}</td\><td\></span>{transaction.returnDate ? new Date(transaction.returnDate).toLocaleDateString() : 'N/A'}</td><td>${transaction.status || 'N/A'}</td></tr>`;
-                    }
-                    tableHTML += '</tbody></table>';
-                    reportData.push(tableHTML);
-                } else {
-                    reportData.push('<p style="font-size: 0.9em;">No borrowing history found for this user within the selected date range.</p>');
-                }
-            } else if (reportType === 'transaction_log') {
-                const transactionsSnapshot = await dbRef.child('transactions').orderByChild('transactionDate').once('value');
-                const transactions = snapshotToArray(transactionsSnapshot).filter(t => (!startDate || (t.transactionDate && new Date(t.transactionDate) >= new Date(startDate))) && (!endDate || (t.transactionDate && new Date(t.transactionDate) <= new Date(endDate))));
-                reportData.push('<h3 style="font-size: 1em; margin-bottom: 0.5em;">Transaction Log</h3>');
-                if (transactions.length > 0) {
-                    let tableHTML = '<table class="report-table"><thead><tr><th>Member</th><th>Book</th><th>Type</th><th>Date</th></tr></thead><tbody>';
-                    for (const transaction of transactions) {
-                        const memberSnapshot = await dbRef.child('members').child(transaction.memberId).once('value');
-                        const member = memberSnapshot.val();
-                        const bookSnapshot = await dbRef.child('books').child(transaction.bookId).once('value');
-                        const book = bookSnapshot.val();
-                        tableHTML += `<tr><td><span class="math-inline">\{member?\.name \|\| 'N/A'\}</td\><td\></span>{book?.title || 'N/A'}</td><td><span class="math-inline">\{transaction\.type \|\| 'N/A'\}</td\><td\></span>{transaction.transactionDate ? new Date(transaction.transactionDate).toLocaleDateString() : 'N/A'}</td></tr>`;
-                    }
-                    tableHTML += '</tbody></table>';
-                    reportData.push(tableHTML);
-                } else {
-                    reportData.push('<p style="font-size: 0.9em;">No transactions found within the selected date range.</p>');
-                }
-            } else if (reportType === 'new_members') {
-                const membersSnapshot = await dbRef.child('members').orderByChild('joinDate').once('value');
-                const newMembers = snapshotToArray(membersSnapshot).filter(m => (!startDate || (m.joinDate && new Date(m.joinDate) >= new Date(startDate))) && (!endDate || (m.joinDate && new Date(m.joinDate) <= new Date(endDate))));
-                reportData.push('<h3 style="font-size: 1em; margin-bottom: 0.5em;">New Members Registered</h3>');
-                if (newMembers.length > 0) {
-                    let tableHTML = '<table class="report-table"><thead><tr><th>Name</th><th>Registration Date</th><th>Email</th></tr></thead><tbody>';
-                    for (const member of newMembers) {
-                        tableHTML += `<tr><td><span class="math-inline">\{member\.name \|\| 'N/A'\}</td\><td\></span>{member.joinDate ? new Date(member.joinDate).toLocaleDateString() : 'N/A'}</td><td>${member.email || 'N/A'}</td></tr>`;
-                    }
-                    tableHTML += '</tbody></table>';
-                    reportData.push(tableHTML);
-                } else {
-                    reportData.push('<p style="font-size: 0.9em;">No new members registered within the selected date range.</p>');}
-            } else if (reportType === 'new_books') {
-                const booksSnapshot = await dbRef.child('books').orderByChild('addedDate').once('value');
-                const newBooks = snapshotToArray(booksSnapshot).filter(b => (!startDate || (b.addedDate && new Date(b.addedDate) >= new Date(startDate))) && (!endDate || (b.addedDate && new Date(b.addedDate) <= new Date(endDate))));
-                reportData.push('<h3 style="font-size: 1em; margin-bottom: 0.5em;">New Books Added</h3>');
-                if (newBooks.length > 0) {
-                    let tableHTML = '<table class="report-table"><thead><tr><th>Title</th><th>Author</th><th>Added Date</th></tr></thead><tbody>';
-                    for (const book of newBooks) {
-                        tableHTML += `<tr><td>${book.title || 'N/A'}</td><td>${book.author || 'N/A'}</td><td>${book.addedDate ? new Date(book.addedDate).toLocaleDateString() : 'N/A'}</td></tr>`;
-                    }
-                    tableHTML += '</tbody></table>';
-                    reportData.push(tableHTML);
-                } else {
-                    reportData.push('<p style="font-size: 0.9em;">No new books added within the selected date range.</p>');
-                }
             }
-
-            customReportOutputDiv.innerHTML = reportData.join('');
-
-        } catch (error) {
-            console.error("Error generating custom report:", error);
-            customReportOutputDiv.innerHTML = '<p style="font-size: 0.9em;">Error generating report.</p>';
-        } finally {
-            hideLoading();
+            loadUserActivity(userActivityTimeframeSelect.value, start, end);
         }
-    }
 
-    // Initialize date pickers for custom ranges
-    flatpickr("#borrowingStart", { dateFormat: "Y-m-d" });
-    flatpickr("#borrowingEnd", { dateFormat: "Y-m-d" });
-    flatpickr("#userActivityStart", { dateFormat: "Y-m-d" });
-    flatpickr("#userActivityEnd", { dateFormat: "Y-m-d" });
-    flatpickr("#startDate", { dateFormat: "Y-m-d" });
-    flatpickr("#endDate", { dateFormat: "Y-m-d" });
+        function loadPopularBooks(timeframe, limit) {
+            showLoading();
+            dbRef.child('transactions').orderByChild('checkoutDate').once('value', snapshot => {
+                const transactions = snapshotToArray(snapshot);
+                const bookCheckoutCounts = {};
+                const now = new Date();
+                let filteredTransactions = transactions;
 
-    // Logout functionality
-    const logoutBtn = document.getElementById('logoutBtn');
-    logoutBtn.addEventListener('click', () => {
-        firebase.auth().signOut()
-            .then(() => {
-                window.location.href = 'index.html'; // Redirect to login page
-            })
-            .catch((error) => {
-                console.error('Logout failed:', error);
-                alert('Logout failed. Please try again.');
-            });
-    });
-</script>
-<script>
-    // <![CDATA[  <-- For SVG support
-    if ('WebSocket' in window) {
-        (function () {
-            function refreshCSS() {
-                var sheets = [].slice.call(document.getElementsByTagName("link"));
-                var head = document.getElementsByTagName("head")[0];
-                for (var i = 0; i < sheets.length; ++i) {
-                    var elem = sheets[i];
-                    var parent = elem.parentElement || head;
-                    parent.removeChild(elem);
-                    var rel = elem.rel;
-                    if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
-                        var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
-                        elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
-                    }
-                    parent.appendChild(elem);
+                if (timeframe === 'last30days') {
+                    const pastDate = new Date(now);
+                    pastDate.setDate(now.getDate() - 30);
+                    filteredTransactions = transactions.filter(t => t.checkoutDate && new Date(t.checkoutDate) >= pastDate);
+                } else if (timeframe === 'thisYear') {
+                    filteredTransactions = transactions.filter(t => t.checkoutDate && new Date(t.checkoutDate).getFullYear() === now.getFullYear());
+                } else if (timeframe === 'allTime') {
+                    // Keep all transactions
                 }
+
+                filteredTransactions.forEach(transaction => {
+                    bookCheckoutCounts[transaction.bookId] = (bookCheckoutCounts[transaction.bookId] || 0) + 1;
+                });
+
+                const sortedTrends = Object.entries(bookCheckoutCounts).sort(([, countA], [, countB]) => countB - countA).slice(0, limit);
+                const labels = [];
+                const data = [];
+
+                Promise.all(sortedTrends.map(([bookId]) => dbRef.child('books').child(bookId).once('value')))
+                    .then(snapshots => {
+                        snapshots.forEach(snapshot => {
+                            if (snapshot.exists()) {
+                                labels.push(snapshot.val().title || 'N/A');
+                                data.push(bookCheckoutCounts[snapshot.key] || 0);
+                            }
+                        });
+                        renderBookPopularityChart(labels, data);
+                    })
+                    .finally(hideLoading);
+            }).catch(() => {
+                hideLoading();
+            });
+        }
+
+        function renderBookPopularityChart(labels, data) {
+            if (bookPopularityChart) {
+                bookPopularityChart.destroy();
             }
-            var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
-            var address = protocol + window.location.host + window.location.pathname + '/ws';
-            var socket = new WebSocket(address);
-            socket.onmessage = function (msg) {
-                if (msg.data == 'reload') window.location.reload();
-                else if (msg.data == 'refreshcss') refreshCSS();
-            };
-            if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_Live-Server')) {
-                console.log('Live reload enabled.');
-                sessionStorage.setItem('IsThisFirstTime_Log_From_Live-Server', true);
+            bookPopularityChart = new Chart(bookPopularityChartCanvas, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(54, 162, 235, 0.7)',
+                            'rgba(255, 206, 86, 0.7)',
+                            'rgba(75, 192, 192, 0.7)',
+                            'rgba(153, 102, 255, 0.7)',
+                            'rgba(255, 159, 64, 0.7)',
+                            'rgba(120, 200, 100, 0.7)',
+                            'rgba(200, 150, 255, 0.7)',
+                            'rgba(255, 100, 200, 0.7)',
+                            'rgba(100, 200, 255, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)',
+                            'rgba(120, 200, 100, 1)',
+                            'rgba(200, 150, 255, 1)',
+                            'rgba(255, 100, 200, 1)',
+                            'rgba(100, 200, 255, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    plugins: {
+                        title: { display: true, text: `Top ${popularityLimitSelect.value} Books`, font: { size: 12 } },
+                        legend: { position: 'bottom', labels: { usePointStyle: true, fontSize: 8 } }
+                    }
+                }
+            });
+        }
+
+        popularityTimeframeSelect.addEventListener('change', updateBookPopularity);
+        popularityLimitSelect.addEventListener('change', updateBookPopularity);
+
+        function updateBookPopularity() {
+            loadPopularBooks(popularityTimeframeSelect.value, parseInt(popularityLimitSelect.value));
+        }
+
+        reportTypeSelect.addEventListener('change', function () {
+            const reportType = this.value;
+            if (
+                reportType === 'book_borrowing' ||
+                reportType === 'user_borrowing' ||
+                reportType === 'transaction_log' ||
+                reportType === 'new_members' ||
+                reportType === 'new_books'
+            ) {
+                dateRangeGroup.style.display = 'flex';
+            } else {
+                dateRangeGroup.style.display = 'none';
             }
-        })();
-    }
-    else {
-        console.error('Upgrade your browser. This page cannot work properly.');
-    }
-    // ]]>
-</script>
+            bookSelectGroup.style.display = reportType === 'book_borrowing' ? 'block' : 'none';
+            userSelectGroup.style.display = reportType === 'user_borrowing' ? 'block' : 'none';
+            customReportOutputDiv.innerHTML = ''; // Clear previous report
+        });
+
+        async function generateCustomReport() {
+            const reportType = reportTypeSelect.value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            let reportData = [];
+            customReportOutputDiv.innerHTML = '<p style="font-size: 0.9em;">Generating report...</p>';
+            showLoading();
+
+            try {
+                if (reportType === 'book_borrowing') {
+                    const bookId = selectedBookSelect.value;
+                    if (!bookId) {
+                        alert('Please select a book.');
+                        hideLoading();
+                        return;
+                    }
+                    const bookSnapshot = await dbRef.child('books').child(bookId).once('value');
+                    const transactionsSnapshot = await dbRef.child('transactions').orderByChild('bookId').equalTo(bookId).once('value');
+                    const transactions = snapshotToArray(transactionsSnapshot).filter(t => (!startDate || (t.checkoutDate && new Date(t.checkoutDate) >= new Date(startDate))) && (!endDate || (t.checkoutDate && new Date(t.checkoutDate) <= new Date(endDate))));
+                    reportData.push(`<h3 style="font-size: 1em; margin-bottom: 0.5em;">Borrowing History: "${bookSnapshot.val()?.title || 'N/A'}"</h3>`);
+                    if (transactions.length > 0) {
+                        let tableHTML = '<table class="report-table"><thead><tr><th>Member</th><th>Checkout Date</th><th>Due Date</th><th>Return Date</th><th>Status</th></tr></thead><tbody>';
+                        for (const transaction of transactions) {
+                            const memberSnapshot = await dbRef.child('members').child(transaction.memberId).once('value');
+                            const member = memberSnapshot.val();
+                            tableHTML += `<tr><td>${member?.name || 'N/A'}</td><td>${transaction.checkoutDate ? new Date(transaction.checkoutDate).toLocaleDateString() : 'N/A'}</td><td>${transaction.dueDate ? new Date(transaction.dueDate).toLocaleDateString() : 'N/A'}</td><td>${transaction.returnDate ? new Date(transaction.returnDate).toLocaleDateString() : 'N/A'}</td><td>${transaction.status || 'N/A'}</td></tr>`;
+                        }
+                        tableHTML += '</tbody></table>';
+                        reportData.push(tableHTML);
+                    } else {
+                        reportData.push('<p style="font-size: 0.9em;">No borrowing history found for this book within the selected date range.</p>');
+                    }
+                } else if (reportType === 'user_borrowing') {
+                    const userId = selectedUserSelect.value;
+                    if (!userId) {
+                        alert('Please select a user.');
+                        hideLoading();
+                        return;
+                    }
+                    const memberSnapshot = await dbRef.child('members').child(userId).once('value');
+                    const member = memberSnapshot.val();
+                    const transactionsSnapshot = await dbRef.child('transactions').orderByChild('memberId').equalTo(userId).once('value');
+                    const transactions = snapshotToArray(transactionsSnapshot).filter(t => (!startDate || (t.checkoutDate && new Date(t.checkoutDate) >= new Date(startDate))) && (!endDate || (t.checkoutDate && new Date(t.checkoutDate) <= new Date(endDate))));
+                    reportData.push(`<h3 style="font-size: 1em; margin-bottom: 0.5em;">Borrowing History: "${member?.name || 'N/A'}"</h3>`);
+                    if (transactions.length > 0) {
+                        let tableHTML = '<table class="report-table"><thead><tr><th>Book</th><th>Checkout Date</th><th>Due Date</th><th>Return Date</th><th>Status</th></tr></thead><tbody>';
+                        for (const transaction of transactions) {
+                            const bookSnapshot = await dbRef.child('books').child(transaction.bookId).once('value');
+                            const book = bookSnapshot.val();
+                            tableHTML += `<tr><td>${book?.title || 'N/A'}</td><td>${transaction.checkoutDate ? new Date(transaction.checkoutDate).toLocaleDateString() : 'N/A'}</td><td>${transaction.dueDate ? new Date(transaction.dueDate).toLocaleDateString() : 'N/A'}</td><td>${transaction.returnDate ? new Date(transaction.returnDate).toLocaleDateString() : 'N/A'}</td><td>${transaction.status || 'N/A'}</td></tr>`;
+                        }
+                        tableHTML += '</tbody></table>';
+                        reportData.push(tableHTML);
+                    } else {
+                        reportData.push('<p style="font-size: 0.9em;">No borrowing history found for this user within the selected date range.</p>');
+                    }
+                } else if (reportType === 'transaction_log') {
+                    const transactionsSnapshot = await dbRef.child('transactions').orderByChild('transactionDate').once('value');
+                    const transactions = snapshotToArray(transactionsSnapshot).filter(t => (!startDate || (t.transactionDate && new Date(t.transactionDate) >= new Date(startDate))) && (!endDate || (t.transactionDate && new Date(t.transactionDate) <= new Date(endDate))));
+                    reportData.push('<h3 style="font-size: 1em; margin-bottom: 0.5em;">Transaction Log</h3>');
+                    if (transactions.length > 0) {
+                        let tableHTML = '<table class="report-table"><thead><tr><th>Member</th><th>Book</th><th>Type</th><th>Date</th></tr></thead><tbody>';
+                        for (const transaction of transactions) {
+                            const memberSnapshot = await dbRef.child('members').child(transaction.memberId).once('value');
+                            const member = memberSnapshot.val();
+                            const bookSnapshot = await dbRef.child('books').child(transaction.bookId).once('value');
+                            const book = bookSnapshot.val();
+                            tableHTML += `<tr><td>${member?.name || 'N/A'}</td><td>${book?.title || 'N/A'}</td><td>${transaction.type || 'N/A'}</td><td>${transaction.transactionDate ? new Date(transaction.transactionDate).toLocaleDateString() : 'N/A'}</td></tr>`;
+                        }
+                        tableHTML += '</tbody></table>';
+                        reportData.push(tableHTML);
+                    } else {
+                        reportData.push('<p style="font-size: 0.9em;">No transactions found within the selected date range.</p>');
+                    }
+                } else if (reportType === 'new_members') {
+                    const membersSnapshot = await dbRef.child('members').orderByChild('joinDate').once('value');
+                    const newMembers = snapshotToArray(membersSnapshot).filter(m => (!startDate || (m.joinDate && new Date(m.joinDate) >= new Date(startDate))) && (!endDate || (m.joinDate && new Date(m.joinDate) <= new Date(endDate))));
+                    reportData.push('<h3 style="font-size: 1em; margin-bottom: 0.5em;">New Members Registered</h3>');
+                    if (newMembers.length > 0) {
+                        let tableHTML = '<table class="report-table"><thead><tr><th>Name</th><th>Registration Date</th><th>Email</th></tr></thead><tbody>';
+                        for (const member of newMembers) {
+                            tableHTML += `<tr><td>${member.name || 'N/A'}</td><td>${member.joinDate ? new Date(member.joinDate).toLocaleDateString() : 'N/A'}</td><td>${member.email || 'N/A'}</td></tr>`;
+                        }
+                        tableHTML += '</tbody></table>';
+                        reportData.push(tableHTML);
+                    } else {
+                        reportData.push('<p style="font-size: 0.9em;">No new members registered within the selected date range.</p>');
+                    }
+                } else if (reportType === 'new_books') {
+                    const booksSnapshot = await dbRef.child('books').orderByChild('addedDate').once('value');
+                    const newBooks = snapshotToArray(booksSnapshot).filter(b => (!startDate || (b.addedDate && new Date(b.addedDate) >= new Date(startDate))) && (!endDate || (b.addedDate && new Date(b.addedDate) <= new Date(endDate))));
+                    reportData.push('<h3 style="font-size: 1em; margin-bottom: 0.5em;">New Books Added</h3>');
+                    if (newBooks.length > 0) {
+                        let tableHTML = '<table class="report-table"><thead><tr><th>Title</th><th>Author</th><th>Added Date</th></tr></thead><tbody>';
+                        for (const book of newBooks) {
+                            tableHTML += `<tr><td>${book.title || 'N/A'}</td><td>${book.author || 'N/A'}</td><td>${book.addedDate ? new Date(book.addedDate).toLocaleDateString() : 'N/A'}</td></tr>`;
+                        }
+                        tableHTML += '</tbody></table>';
+                        reportData.push(tableHTML);
+                    } else {
+                        reportData.push('<p style="font-size: 0.9em;">No new books added within the selected date range.</p>');
+                    }
+                } else {
+                    reportData.push('<p style="font-size: 0.9em;">Please select a valid report type.</p>');
+                }
+
+                customReportOutputDiv.innerHTML = reportData.join('');
+            } catch (error) {
+                console.error("Error generating custom report:", error);
+                customReportOutputDiv.innerHTML = '<p style="font-size: 0.9em;">Error generating report.</p>';
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Initialize date pickers for custom ranges
+        flatpickr("#borrowingStart", { dateFormat: "Y-m-d" });
+        flatpickr("#borrowingEnd", { dateFormat: "Y-m-d" });
+        flatpickr("#userActivityStart", { dateFormat: "Y-m-d" });
+        flatpickr("#userActivityEnd", { dateFormat: "Y-m-d" });
+        flatpickr("#startDate", { dateFormat: "Y-m-d" });
+        flatpickr("#endDate", { dateFormat: "Y-m-d" });
+
+        // Logout functionality
+        const logoutBtn = document.getElementById('logoutBtn');
+        logoutBtn.addEventListener('click', () => {
+            firebase.auth().signOut()
+                .then(() => {
+                    window.location.href = 'index.html'; // Redirect to login page
+                })
+                .catch((error) => {
+                    console.error('Logout failed:', error);
+                    alert('Logout failed. Please try again.');
+                });
+        });
+    </script>
+    <script>
+        // <![CDATA[  <-- For SVG support
+        if ('WebSocket' in window) {
+            (function () {
+                function refreshCSS() {
+                    var sheets = [].slice.call(document.getElementsByTagName("link"));
+                    var head = document.getElementsByTagName("head")[0];
+                    for (var i = 0; i < sheets.length; ++i) {
+                        var elem = sheets[i];
+                        var parent = elem.parentElement || head;
+                        parent.removeChild(elem);
+                        var rel = elem.rel;
+                        if (elem.href && (typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet")) {
+                            var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+                            elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+                        }
+                        parent.appendChild(elem);
+                    }
+                }
+                var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+                var address = protocol + window.location.host + window.location.pathname + '/ws';
+                var socket = new WebSocket(address);
+                socket.onmessage = function (msg) {
+                    if (msg.data == 'reload') window.location.reload();
+                    else if (msg.data == 'refreshcss') refreshCSS();
+                };
+                if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_Live-Server')) {
+                    console.log('Live reload enabled.');
+                    sessionStorage.setItem('IsThisFirstTime_Log_From_Live-Server', true);
+                }
+            })();
+        }
+        else {
+            console.error('Upgrade your browser. This page cannot work properly.');
+        }
+        // ]]>
+    </script>
 </body>
 </html>
